@@ -143,8 +143,12 @@ class _Grid extends StatelessWidget {
   /// Everything in a tile that is not text: padding, the accent rule, the gaps
   /// between the three blocks, and the meter track.
   static const _tileChrome =
-      Space.lg * 2 + _CategoryTile.ruleHeight + Space.lg + Space.xs +
-      Space.md + Sizes.meterTrack;
+      Space.lg * 2 +
+      _CategoryTile.ruleHeight +
+      Space.lg +
+      Space.xs +
+      Space.md +
+      Sizes.meterTrack;
 
   @override
   Widget build(BuildContext context) {

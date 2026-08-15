@@ -109,9 +109,9 @@ Before the first automated release will succeed:
 - [ ] Release keystore created (`tools/create_release_keystore.sh`)
 - [ ] Release SHA-1 and SHA-256 registered in Firebase
 - [ ] Play App Signing SHA-1 registered (once the app is uploaded to Play once)
-- [ ] `GOOGLE_SERVICES_JSON`, `RELEASE_KEYSTORE_BASE64`,
-      `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`
-      set as repository secrets
+- [ ] `GOOGLE_SERVICES_JSON`, `FIREBASE_OPTIONS_DART`,
+      `RELEASE_KEYSTORE_BASE64`, `RELEASE_KEYSTORE_PASSWORD`,
+      `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` set as repository secrets
 - [ ] Actions → General → Workflow permissions set to "Read and write"
 - [ ] App Check switched to Play Integrity (already the non-debug default)
 - [ ] Firestore rules deployed

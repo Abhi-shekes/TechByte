@@ -78,8 +78,7 @@ class DailySessionCard extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (done)
-              Icon(Icons.check_circle_rounded, size: 14, color: color),
+            if (done) Icon(Icons.check_circle_rounded, size: 14, color: color),
           ],
         ),
       ),

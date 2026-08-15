@@ -211,36 +211,38 @@ class _AppNavBarState extends State<AppNavBar>
                       animation: _controller,
                       builder: (context, _) => Row(
                         children: [
-                          for (var i = 0; i < widget.destinations.length; i++)
-                            ...[
-                              if (i > 0)
-                                VerticalDivider(
-                                  width: 1,
-                                  thickness: 1,
-                                  indent: height * AppNavBar._separatorRatio,
-                                  endIndent:
-                                      height * AppNavBar._separatorRatio,
-                                  color: AppNavBar._separator,
-                                ),
-                              Expanded(
-                                child: _NavItem(
-                                  destination: widget.destinations[i],
-                                  // How close the emphasis is to this
-                                  // destination right now. Colour is a
-                                  // function of the travelling value rather
-                                  // than of a boolean, so it arrives with the
-                                  // movement instead of switching on at the
-                                  // end of it.
-                                  proximity: (1 - (_position - i).abs()).clamp(
-                                    0.0,
-                                    1.0,
-                                  ),
-                                  selected: i == widget.currentIndex,
-                                  iconSize: wide ? 24 : 22,
-                                  onTap: () => _select(i),
-                                ),
+                          for (
+                            var i = 0;
+                            i < widget.destinations.length;
+                            i++
+                          ) ...[
+                            if (i > 0)
+                              VerticalDivider(
+                                width: 1,
+                                thickness: 1,
+                                indent: height * AppNavBar._separatorRatio,
+                                endIndent: height * AppNavBar._separatorRatio,
+                                color: AppNavBar._separator,
                               ),
-                            ],
+                            Expanded(
+                              child: _NavItem(
+                                destination: widget.destinations[i],
+                                // How close the emphasis is to this
+                                // destination right now. Colour is a
+                                // function of the travelling value rather
+                                // than of a boolean, so it arrives with the
+                                // movement instead of switching on at the
+                                // end of it.
+                                proximity: (1 - (_position - i).abs()).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
+                                selected: i == widget.currentIndex,
+                                iconSize: wide ? 24 : 22,
+                                onTap: () => _select(i),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -309,7 +311,10 @@ class _NavItem extends StatelessWidget {
           message: destination.label,
           // The dock's own height is the target, so every destination is a
           // full-height column rather than an icon with a hit box round it.
-          child: InkWell(onTap: onTap, child: Center(child: icon)),
+          child: InkWell(
+            onTap: onTap,
+            child: Center(child: icon),
+          ),
         ),
       ),
     );

@@ -176,10 +176,9 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
           ? _NothingToPractise(
               mode: widget.mode,
               notice: state.notice,
-              onRetry: () =>
-                  ref.read(practiceControllerProvider.notifier).start(
-                    widget.mode,
-                  ),
+              onRetry: () => ref
+                  .read(practiceControllerProvider.notifier)
+                  .start(widget.mode),
             )
           : ListView(
               controller: _scrollController,
@@ -219,11 +218,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                     answer: _answerController.text,
                   ),
                   const SizedBox(height: Space.xl),
-                  _AfterActions(
-                    task: task,
-                    onNext: _next,
-                    onRetry: _retry,
-                  ),
+                  _AfterActions(task: task, onNext: _next, onRetry: _retry),
                 ],
               ],
             ),
@@ -522,7 +517,9 @@ class _Composer extends StatelessWidget {
               ActionChip(
                 label: Text(scaffold.label),
                 avatar: Icon(Icons.add_rounded, size: 14, color: accent),
-                onPressed: isGrading ? null : () => onScaffold(scaffold.snippet),
+                onPressed: isGrading
+                    ? null
+                    : () => onScaffold(scaffold.snippet),
               ),
           ],
         ),
@@ -619,10 +616,7 @@ class _Composer extends StatelessWidget {
                 ),
                 const SizedBox(width: Space.md),
                 Expanded(
-                  child: Text(
-                    task.hint!,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  child: Text(task.hint!, style: theme.textTheme.bodyMedium),
                 ),
               ],
             ),
@@ -702,7 +696,8 @@ class _PacingBarState extends State<_PacingBar> {
 
     return Semantics(
       label: 'Time spent',
-      value: '${_elapsed.inSeconds} seconds of '
+      value:
+          '${_elapsed.inSeconds} seconds of '
           '${widget.target.inSeconds}',
       child: ExcludeSemantics(
         child: Row(
