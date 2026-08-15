@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A measured audit and five-phase plan to make TechByte's interface consistent, accessible, and minimal.">
+<style>
+  /* minimal reset (supplied by the artifact runtime; inlined here for the standalone file) */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+  img, svg { display: block; max-width: 100%; }
+  table { border-collapse: collapse; }
+  :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+</style>
+<title>TechByte UI Redesign</title>
+<style>
+  /* ── Tokens: light is the complete set ───────────────────────────── */
+  :root {
+    --ground:      #F6F8FA;
+    --surface:     #FFFFFF;
+    --raised:      #EDF1F5;
+    --line:        #DCE3EA;
+    --line-soft:   #E8EDF2;
+    --ink:         #0D1117;
+    --ink-2:       #4E5A67;
+    --ink-3:       #7C8794;
+    --accent:      #1167FF;
+    --accent-soft: #E6EEFF;
+    --pass:        #188350;
+    --pass-soft:   #E3F4EB;
+    --fail:        #D31212;
+    --fail-soft:   #FCE9E9;
+    --warn:        #A36503;
+    --warn-soft:   #FBF0DC;
+    --shadow:      0 1px 2px rgba(13,17,23,.05), 0 8px 24px -12px rgba(13,17,23,.14);
+
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    /* the same 4pt scale this document proposes for the app */
+    --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px; --s5: 20px;
+    --s6: 24px; --s7: 32px; --s8: 40px; --s9: 48px; --s10: 64px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0A0C0F;
+      --surface:     #13171D;
+      --raised:      #1B2027;
+      --line:        #2A313B;
+      --line-soft:   #1F252D;
+      --ink:         #F2F5F8;
+      --ink-2:       #9BA6B4;
+      --ink-3:       #6C7787;
+      --accent:      #6BA4FF;
+      --accent-soft: #16233A;
+      --pass:        #3DD68C;
+      --pass-soft:   #10261C;
+      --fail:        #F25C5C;
+      --fail-soft:   #2A1416;
+      --warn:        #F5A524;
+      --warn-soft:   #291D0C;
+      --shadow:      0 1px 2px rgba(0,0,0,.4), 0 8px 28px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:      #0A0C0F;
+    --surface:     #13171D;
+    --raised:      #1B2027;
+    --line:        #2A313B;
+    --line-soft:   #1F252D;
+    --ink:         #F2F5F8;
+    --ink-2:       #9BA6B4;
+    --ink-3:       #6C7787;
+    --accent:      #6BA4FF;
+    --accent-soft: #16233A;
+    --pass:        #3DD68C;
+    --pass-soft:   #10261C;
+    --fail:        #F25C5C;
+    --fail-soft:   #2A1416;
+    --warn:        #F5A524;
+    --warn-soft:   #291D0C;
+    --shadow:      0 1px 2px rgba(0,0,0,.4), 0 8px 28px -12px rgba(0,0,0,.7);
+  }
+
+  /* ── Base ────────────────────────────────────────────────────────── */
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: var(--s9) var(--s5) var(--s10);
+  }
+  @media (max-width: 640px) { .wrap { padding: var(--s7) var(--s4) var(--s9); } }
+
+  p { margin: 0; max-width: 68ch; }
+  strong { font-weight: 650; color: var(--ink); }
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    background: var(--raised);
+    border: 1px solid var(--line-soft);
+    border-radius: 5px;
+    padding: .1em .38em;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  a { color: var(--accent); }
+
+  /* ── Masthead ────────────────────────────────────────────────────── */
+  .masthead { display: flex; flex-direction: column; gap: var(--s4); margin-bottom: var(--s9); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0;
+  }
+  h1 {
+    font-size: clamp(30px, 5.4vw, 42px);
+    line-height: 1.12;
+    letter-spacing: -.028em;
+    font-weight: 720;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst { font-size: 17.5px; color: var(--ink-2); max-width: 62ch; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5);
+    font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+    border-top: 1px solid var(--line); padding-top: var(--s3); margin-top: var(--s2);
+  }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+
+  /* ── Sections ────────────────────────────────────────────────────── */
+  section { margin-top: var(--s10); }
+  section > * + * { margin-top: var(--s4); }
+  .sec-head { display: flex; flex-direction: column; gap: var(--s1); margin-bottom: var(--s6) !important; }
+  .sec-num {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+    letter-spacing: .16em; color: var(--accent);
+  }
+  h2 {
+    font-size: clamp(23px, 3.4vw, 28px);
+    line-height: 1.2; letter-spacing: -.02em; font-weight: 700; margin: 0;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 17px; line-height: 1.35; letter-spacing: -.008em;
+    font-weight: 660; margin: var(--s7) 0 var(--s3);
+  }
+  h4 {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+    margin: var(--s6) 0 var(--s3);
+  }
+
+  ul, ol { margin: 0; padding-left: 1.25em; max-width: 68ch; }
+  li + li { margin-top: var(--s2); }
+  li::marker { color: var(--ink-3); }
+
+  /* ── Panels ──────────────────────────────────────────────────────── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: var(--s5);
+  }
+  .panel > * + * { margin-top: var(--s3); }
+  .panel.flag { border-left: 3px solid var(--accent); border-radius: 4px 14px 14px 4px; }
+  .panel.flag.is-fail { border-left-color: var(--fail); }
+
+  /* ── Finding rows ────────────────────────────────────────────────── */
+  .findings { display: flex; flex-direction: column; gap: var(--s3); }
+  .finding {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: var(--s4);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: var(--s4) var(--s5);
+    align-items: start;
+  }
+  @media (max-width: 600px) { .finding { grid-template-columns: 1fr; gap: var(--s2); } }
+  .sev {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 999px; text-align: center;
+    justify-self: start; white-space: nowrap;
+  }
+  .sev.p1 { background: var(--fail-soft); color: var(--fail); }
+  .sev.p2 { background: var(--warn-soft); color: var(--warn); }
+  .sev.p3 { background: var(--accent-soft); color: var(--accent); }
+  .finding-body > * + * { margin-top: var(--s2); }
+  .finding-title { font-weight: 640; font-size: 15.5px; letter-spacing: -.005em; }
+  .finding p { font-size: 14.5px; color: var(--ink-2); }
+  .where {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
+    display: block; max-width: none; white-space: normal; word-break: break-word;
+  }
+
+  /* ── Tables ──────────────────────────────────────────────────────── */
+  .tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px var(--s4); border-bottom: 1px solid var(--line-soft); }
+  th {
+    font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+    background: var(--raised); white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.tok { font-family: var(--mono); font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+  .ratio-bad { color: var(--fail); font-weight: 600; }
+  .ratio-ok  { color: var(--pass); font-weight: 600; }
+
+  .sw {
+    display: inline-block; width: 13px; height: 13px; border-radius: 3px;
+    vertical-align: -2px; margin-right: 7px; border: 1px solid rgba(128,128,128,.28);
+  }
+  .chip-demo {
+    display: inline-block; font-family: var(--mono); font-size: 10.5px;
+    font-weight: 700; letter-spacing: .1em; padding: 2px 6px; border-radius: 4px;
+  }
+
+  /* ── Grid of cards ───────────────────────────────────────────────── */
+  .grid { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: var(--s4);
+  }
+  .card > * + * { margin-top: var(--s2); }
+  .card h5 {
+    margin: 0; font-size: 14.5px; font-weight: 650; letter-spacing: -.005em;
+  }
+  .card p { font-size: 13.5px; color: var(--ink-2); }
+
+  /* ── Phase blocks ────────────────────────────────────────────────── */
+  .phase {
+    display: grid; grid-template-columns: auto 1fr; gap: 0 var(--s5);
+    padding-bottom: var(--s7);
+  }
+  .phase:last-child { padding-bottom: 0; }
+  .rail { display: flex; flex-direction: column; align-items: center; gap: var(--s2); }
+  .dot {
+    width: 30px; height: 30px; border-radius: 999px; flex: none;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid var(--accent);
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+  }
+  .stem { width: 1px; flex: 1; background: var(--line); min-height: 12px; }
+  .phase-body > * + * { margin-top: var(--s3); }
+  .phase-body h3 { margin: 0; font-size: 18px; }
+  .tagline { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); letter-spacing: .04em; }
+
+  .files { font-family: var(--mono); font-size: 12px; color: var(--ink-2); line-height: 1.9; }
+  .files span {
+    background: var(--raised); border: 1px solid var(--line-soft);
+    border-radius: 5px; padding: 2px 6px; margin-right: 5px; display: inline-block;
+    white-space: nowrap;
+  }
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: var(--s7) 0; }
+  .footnote { font-size: 13.5px; color: var(--ink-3); max-width: 68ch; }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Design plan · Flutter · Material 3</p>
+    <h1>TechByte UI Redesign</h1>
+    <p class="standfirst">
+      The theme layer is already good. What's missing is the discipline that makes it
+      hold across fifteen screens — a token system nothing bypasses, a component set
+      that stops the copy-paste, and a light mode that is actually legible.
+    </p>
+    <div class="meta">
+      <span><b>Scope</b> 15 screens · 22 UI files</span>
+      <span><b>Codebase</b> techbyte/lib</span>
+      <span><b>Posture</b> Dark-first, minimal, editorial</span>
+    </div>
+  </header>
+
+  <!-- ══ 1 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>What I found</h2>
+    </div>
+
+    <p>
+      I read every screen. The foundation is more considered than most apps this size:
+      one accent, restrained per-category hues, a real reason behind the type sizes,
+      and comments that explain intent rather than mechanics. The problems are not
+      taste problems — they are <strong>systems problems</strong>. Values that should
+      live in one place live in twenty, and the light theme was never designed, only
+      derived.
+    </p>
+
+    <p>
+      Findings are ranked by what they cost a user, not by how much code they touch.
+    </p>
+
+    <div class="findings" style="margin-top: var(--s6)">
+
+      <div class="finding">
+        <span class="sev p1">Blocking</span>
+        <div class="finding-body">
+          <div class="finding-title">Light mode fails contrast everywhere it uses colour</div>
+          <p>
+            All 18 category hues, plus the accent and all three semantic colours, are
+            reused verbatim in light mode. They were tuned for a <code>#0A0C0F</code>
+            ground. On <code>#FBFCFD</code> not one of them reaches 4.5:1 — the worst
+            sits at <strong>1.44:1</strong>. This is rendered at 11.5px as the category
+            label above every single question.
+          </p>
+          <span class="where">app_palette.dart:39–63 — <code>forCategory</code> switches only the fallback, never the value</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p1">Blocking</span>
+        <div class="finding-body">
+          <div class="finding-title">Four screens dump a raw error object at the user</div>
+          <p>
+            <code>Center(child: Text('$error'))</code> — a Dart exception, unstyled,
+            with no retry. The feed has a proper error state with a recovery action;
+            Explore, Saved, History and Search do not.
+          </p>
+          <span class="where">explore_screen.dart:42 · saved_screen.dart:33 · history_screen.dart:42 · search_screen.dart:104</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">The panel is reinvented seven times</div>
+          <p>
+            The same "tinted box with a hairline border" appears in seven places with
+            <strong>four different radii</strong> (12, 14, 16, 18) and three different
+            paddings. Nothing enforces it, so each new one drifts further.
+          </p>
+          <span class="where">question_card.dart:266 · feed_screen.dart:166 · daily_session_card.dart:32 · practice_session_screen.dart:206, 377, 467 · deep_dive_sheet.dart:184</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Explore tiles look tappable and aren't</div>
+          <p>
+            A 2-column grid of 18 category cards with progress bars, no
+            <code>onTap</code>, no ink response. It's the most inviting surface in the
+            app and it's a dead end — there's no route from a topic to that topic's
+            questions. The tile also hand-rolls a <code>Container</code> instead of
+            using <code>Card</code>, so it renders at radius 18 while every other card
+            is 20.
+          </p>
+          <span class="where">explore_screen.dart:60, 90–96</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Reduced-motion is honoured in one place out of three</div>
+          <p>
+            <code>QuestionCard</code> collapses its reveal to 1ms correctly. The
+            onboarding page transition (280ms) and the practice grade-scroll (400ms)
+            ignore the preference entirely. A motion setting that works on one animation
+            is arguably worse than none, because it stops the user looking for another.
+          </p>
+          <span class="where">question_card.dart:55 · onboarding_screen.dart:65 · practice_session_screen.dart:50</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Every loading state is a bare centred spinner</div>
+          <p>
+            Six of them. Each one throws away layout the app already knows — the feed
+            card, the 2-column grid, the list of question tiles all have a known shape —
+            then jumps when content lands. Below the ~400ms Doherty threshold a skeleton
+            reads as instant; a spinner reads as waiting.
+          </p>
+          <span class="where">feed_screen.dart:41 · explore_screen.dart:41 · saved_screen.dart:32 · history_screen.dart:41 · search_screen.dart:101 · practice_session_screen.dart:88</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Eleven inline font-size overrides contradict the type scale</div>
+          <p>
+            <code>bodyMedium</code> is patched to 12.5 in four files and 12 in two more;
+            <code>labelSmall</code> to 10 in two and 13 in two. The theme declares seven
+            roles; the app actually ships eleven. The scale is missing a caption size and
+            a second label size, so every screen invents them.
+          </p>
+          <span class="where">explore:121 · profile:81,426 · practice:69 · search:260 · daily_session:65,74 · sign_in:97,156 · history:83,96,107 · splash:37</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Six hand-written empty states, no two alike</div>
+          <p>
+            Different gaps (8 vs 10 vs 14), different alignment, and only one of the six
+            has an icon. These are the screens a new user sees <em>first</em> — before
+            any content exists, the empty state <em>is</em> the product.
+          </p>
+          <span class="where">feed_screen.dart:195 · saved_screen.dart:43 · history_screen.dart:124 · search_screen.dart:268 · practice_session_screen.dart:495</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p2">High</span>
+        <div class="finding-body">
+          <div class="finding-title">Progress meters: three implementations, three bar heights</div>
+          <p>
+            Label + track + value appears in profile familiarity (6px, 130px label),
+            practice dimensions (5px, 150px label) and explore tiles (4px, no label).
+            None carry a <code>Semantics</code> value, so a screen reader hears nothing
+            at all from any of them.
+          </p>
+          <span class="where">profile_screen.dart:465 · practice_session_screen.dart:318 · explore_screen.dart:126</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">Six horizontal gutters across fifteen screens</div>
+          <p>
+            16, 20, 24 and 28 all appear as page padding, with no rule about which
+            applies where. Vertical rhythm is worse: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20,
+            22, 24, 26, 28 and 32 are all in use as <code>SizedBox</code> heights.
+          </p>
+          <span class="where">All presentation files</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">The question list tile is written three times</div>
+          <p>
+            Saved, Search and History each build a near-identical
+            <code>Card</code> + <code>ListTile</code> that opens the deep-dive sheet, with
+            small gratuitous differences in the trailing slot and subtitle padding.
+          </p>
+          <span class="where">saved_screen.dart:126 · search_screen.dart:147 · history_screen.dart:70</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">Profile is a 506-line kitchen sink</div>
+          <p>
+            Identity, four stats, a History link, topic familiarity, seven settings
+            controls, sign-out and account deletion in one unbroken scroll — eleven
+            decision points with no chunking. "Delete account" sits directly under
+            "Sign out" with 10px between them.
+          </p>
+          <span class="where">profile_screen.dart:41–185</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">Two different search patterns for the same job</div>
+          <p>
+            Explore hides search behind an app-bar icon that pushes a full screen; Saved
+            embeds an inline <code>SearchBar</code> that scrolls away with the list. Same
+            task, two mental models.
+          </p>
+          <span class="where">explore_screen.dart:29 · saved_screen.dart:93</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">Accessibility gaps in the feed card</div>
+          <p>
+            <code>visualDensity: compact</code> shrinks the bookmark and overflow buttons
+            below the 44px target minimum, at the top corner of the screen where they're
+            hardest to hit. Disabled practice cards use <code>Opacity(0.55)</code>, which
+            drags their body text under 4.5:1. History encodes "Completed" in green with
+            no second channel.
+          </p>
+          <span class="where">question_card.dart:208 · practice_screen.dart:108 · history_screen.dart:96</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">The daily-session strip floats over the question</div>
+          <p>
+            Positioned at <code>safeTop + 52</code> while the card's own header sits at
+            <code>safeTop</code> and the question starts 28px below it. On short screens
+            or with a long two-line question these collide.
+          </p>
+          <span class="where">feed_screen.dart:82–87</span>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev p3">Medium</span>
+        <div class="finding-body">
+          <div class="finding-title">Loose ends</div>
+          <p>
+            Icons mix <code>_outlined</code>, <code>_rounded</code> and bare variants
+            within a single row. Buttons are locked to a 52px minimum, which is right for
+            a primary CTA and oversized for "Try again" inside a sheet. The Google button
+            uses <code>Icons.g_mobiledata_rounded</code> — a Material glyph standing in
+            for the Google mark. The AI budget renders from a hardcoded
+            <code>'40'</code> in the widget layer.
+          </p>
+          <span class="where">app_shell.dart:14 · app_theme.dart:106,116 · sign_in_screen.dart:146 · profile_screen.dart:191</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ 2 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>Principles this plan is built on</h2>
+    </div>
+
+    <p>
+      Six ideas decide every call below. Where two conflict, the earlier one wins.
+    </p>
+
+    <div class="grid" style="margin-top: var(--s5)">
+      <div class="card">
+        <h5>The question is the interface</h5>
+        <p>
+          Everything else is chrome. Chrome gets quieter, never louder. No decoration
+          competes with 32px of display type on an empty ground.
+        </p>
+      </div>
+      <div class="card">
+        <h5>One emphasis per screen</h5>
+        <p>
+          Von Restorff: a highlight only reads as one if it's alone. Right now the accent
+          carries category identity, the reveal action <em>and</em> progress. Split those
+          jobs so the accent means "the thing to do next".
+        </p>
+      </div>
+      <div class="card">
+        <h5>Spacing is grouping</h5>
+        <p>
+          Gestalt proximity does the work that borders and dividers are currently doing.
+          A strict 4pt scale with meaningful jumps replaces the ad-hoc values, and most
+          existing dividers come out.
+        </p>
+      </div>
+      <div class="card">
+        <h5>Progressive disclosure, already the core mechanic</h5>
+        <p>
+          The reveal gesture is the product's best idea. Extend the same logic outward:
+          Profile shows identity and progress, settings sit one level down.
+        </p>
+      </div>
+      <div class="card">
+        <h5>Every state is a designed state</h5>
+        <p>
+          Loading, empty, error and offline get the same care as the happy path, from the
+          same three components — not improvised per screen.
+        </p>
+      </div>
+      <div class="card">
+        <h5>Accessible by construction</h5>
+        <p>
+          WCAG 2.2 AA is a build constraint, not a review step: 4.5:1 text, 3:1 non-text,
+          44px targets, colour never the only channel, one motion switch that governs
+          everything.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 3 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>Foundation: the token layer</h2>
+    </div>
+
+    <p>
+      One new file, <code>lib/app/theme/app_tokens.dart</code>, holding every constant the
+      UI is allowed to use. After this lands, a raw number in a presentation file is a
+      review failure.
+    </p>
+
+    <h3>Colour — rebuilding light mode</h3>
+    <p>
+      <code>forCategory</code> becomes brightness-aware for real. The dark values are
+      excellent and stay untouched; light gets a parallel set, hue preserved, luminance
+      lowered until each clears 4.5:1 on <code>#FBFCFD</code>. Measured, not eyeballed:
+    </p>
+
+    <div class="tw" style="margin-top: var(--s4)">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Dark value</th>
+            <th class="num">on dark</th>
+            <th>Light value — new</th>
+            <th class="num">now</th>
+            <th class="num">was</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Programming</td><td class="tok"><span class="sw" style="background:#7AA2F7"></span>#7AA2F7</td><td class="num ratio-ok">7.78</td><td class="tok"><span class="sw" style="background:#2568F8"></span>#2568F8</td><td class="num ratio-ok">4.63</td><td class="num ratio-bad">2.45</td></tr>
+          <tr><td>Computer science</td><td class="tok"><span class="sw" style="background:#9D7CD8"></span>#9D7CD8</td><td class="num ratio-ok">5.88</td><td class="tok"><span class="sw" style="background:#865BD2"></span>#865BD2</td><td class="num ratio-ok">4.60</td><td class="num ratio-bad">3.24</td></tr>
+          <tr><td>Operating systems</td><td class="tok"><span class="sw" style="background:#E0AF68"></span>#E0AF68</td><td class="num ratio-ok">9.79</td><td class="tok"><span class="sw" style="background:#9D681C"></span>#9D681C</td><td class="num ratio-ok">4.61</td><td class="num ratio-bad">1.95</td></tr>
+          <tr><td>Networking</td><td class="tok"><span class="sw" style="background:#7DCFFF"></span>#7DCFFF</td><td class="num ratio-ok">11.41</td><td class="tok"><span class="sw" style="background:#0078BF"></span>#0078BF</td><td class="num ratio-ok">4.61</td><td class="num ratio-bad">1.67</td></tr>
+          <tr><td>Internet</td><td class="tok"><span class="sw" style="background:#56C7E5"></span>#56C7E5</td><td class="num ratio-ok">9.97</td><td class="tok"><span class="sw" style="background:#137D9A"></span>#137D9A</td><td class="num ratio-ok">4.62</td><td class="num ratio-bad">1.91</td></tr>
+          <tr><td>Databases</td><td class="tok"><span class="sw" style="background:#73DACA"></span>#73DACA</td><td class="num ratio-ok">11.76</td><td class="tok"><span class="sw" style="background:#1F8172"></span>#1F8172</td><td class="num ratio-ok">4.60</td><td class="num ratio-bad">1.62</td></tr>
+          <tr><td>Backend</td><td class="tok"><span class="sw" style="background:#89DDFF"></span>#89DDFF</td><td class="num ratio-ok">12.92</td><td class="tok"><span class="sw" style="background:#007BAD"></span>#007BAD</td><td class="num ratio-ok">4.61</td><td class="num ratio-bad">1.48</td></tr>
+          <tr><td>Cloud</td><td class="tok"><span class="sw" style="background:#82AAFF"></span>#82AAFF</td><td class="num ratio-ok">8.53</td><td class="tok"><span class="sw" style="background:#1F67FF"></span>#1F67FF</td><td class="num ratio-ok">4.60</td><td class="num ratio-bad">2.24</td></tr>
+          <tr><td>DevOps</td><td class="tok"><span class="sw" style="background:#F7768E"></span>#F7768E</td><td class="num ratio-ok">7.40</td><td class="tok"><span class="sw" style="background:#C4102C"></span>#C4102C</td><td class="num ratio-ok">5.91</td><td class="num ratio-bad">2.58</td></tr>
+          <tr><td>AI &amp; ML</td><td class="tok"><span class="sw" style="background:#BB9AF7"></span>#BB9AF7</td><td class="num ratio-ok">8.47</td><td class="tok"><span class="sw" style="background:#894CF6"></span>#894CF6</td><td class="num ratio-ok">4.62</td><td class="num ratio-bad">2.25</td></tr>
+          <tr><td>Hardware</td><td class="tok"><span class="sw" style="background:#FF9E64"></span>#FF9E64</td><td class="num ratio-ok">9.63</td><td class="tok"><span class="sw" style="background:#C74B00"></span>#C74B00</td><td class="num ratio-ok">4.61</td><td class="num ratio-bad">1.98</td></tr>
+          <tr><td>Mobile</td><td class="tok"><span class="sw" style="background:#4FD6BE"></span>#4FD6BE</td><td class="num ratio-ok">10.91</td><td class="tok"><span class="sw" style="background:#1B816F"></span>#1B816F</td><td class="num ratio-ok">4.63</td><td class="num ratio-bad">1.75</td></tr>
+          <tr><td>Cybersecurity</td><td class="tok"><span class="sw" style="background:#F7768E"></span>#F7768E</td><td class="num ratio-ok">7.40</td><td class="tok"><span class="sw" style="background:#B01236"></span>#B01236</td><td class="num ratio-ok">6.85</td><td class="num ratio-bad">2.58</td></tr>
+          <tr><td>Electronics</td><td class="tok"><span class="sw" style="background:#FFC777"></span>#FFC777</td><td class="num ratio-ok">12.76</td><td class="tok"><span class="sw" style="background:#A76300"></span>#A76300</td><td class="num ratio-ok">4.62</td><td class="num ratio-bad">1.49</td></tr>
+          <tr><td>Distributed systems</td><td class="tok"><span class="sw" style="background:#C099FF"></span>#C099FF</td><td class="num ratio-ok">8.62</td><td class="tok"><span class="sw" style="background:#8C46FF"></span>#8C46FF</td><td class="num ratio-ok">4.61</td><td class="num ratio-bad">2.21</td></tr>
+          <tr><td>System design</td><td class="tok"><span class="sw" style="background:#86E1FC"></span>#86E1FC</td><td class="num ratio-ok">13.23</td><td class="tok"><span class="sw" style="background:#007CA1"></span>#007CA1</td><td class="num ratio-ok">4.65</td><td class="num ratio-bad">1.44</td></tr>
+          <tr><td>Developer tools</td><td class="tok"><span class="sw" style="background:#A9B1D6"></span>#A9B1D6</td><td class="num ratio-ok">9.28</td><td class="tok"><span class="sw" style="background:#5F6FB7"></span>#5F6FB7</td><td class="num ratio-ok">4.60</td><td class="num ratio-bad">2.06</td></tr>
+          <tr><td>Real-world tech</td><td class="tok"><span class="sw" style="background:#7DE3A3"></span>#7DE3A3</td><td class="num ratio-ok">12.48</td><td class="tok"><span class="sw" style="background:#198441"></span>#198441</td><td class="num ratio-ok">4.63</td><td class="num ratio-bad">1.53</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="footnote" style="margin-top: var(--s3)">
+      DevOps and Cybersecurity currently share <code>#F7768E</code> — two categories with
+      one identity. The light set separates them (crimson vs. rose-red); the dark set
+      should be split the same way.
+    </p>
+
+    <h4>Accent and semantics</h4>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Role</th><th>Dark</th><th class="num">Ratio</th><th>Light — new</th><th class="num">Now</th><th class="num">Was</th></tr></thead>
+        <tbody>
+          <tr><td>Accent</td><td class="tok"><span class="sw" style="background:#6BA4FF"></span>#6BA4FF</td><td class="num ratio-ok">7.81</td><td class="tok"><span class="sw" style="background:#1167FF"></span>#1167FF</td><td class="num ratio-ok">4.64</td><td class="num ratio-bad">3.12</td></tr>
+          <tr><td>Success</td><td class="tok"><span class="sw" style="background:#3DD68C"></span>#3DD68C</td><td class="num ratio-ok">—</td><td class="tok"><span class="sw" style="background:#188350"></span>#188350</td><td class="num ratio-ok">4.65</td><td class="num ratio-bad">1.83</td></tr>
+          <tr><td>Warning</td><td class="tok"><span class="sw" style="background:#F5A524"></span>#F5A524</td><td class="num ratio-ok">—</td><td class="tok"><span class="sw" style="background:#A36503"></span>#A36503</td><td class="num ratio-ok">4.63</td><td class="num ratio-bad">1.99</td></tr>
+          <tr><td>Danger</td><td class="tok"><span class="sw" style="background:#F25C5C"></span>#F25C5C</td><td class="num ratio-ok">—</td><td class="tok"><span class="sw" style="background:#E60C0C"></span>#E60C0C</td><td class="num ratio-ok">4.62</td><td class="num ratio-bad">3.16</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Type — closing the eleven holes</h3>
+    <p>
+      Two roles are added (<code>bodySmall</code>, <code>labelLarge</code>) and one mono
+      size. That is exactly what the eleven inline overrides were reaching for, so all
+      eleven delete.
+    </p>
+
+    <div class="tw" style="margin-top: var(--s4)">
+      <table>
+        <thead><tr><th>Role</th><th class="num">Size / LH</th><th class="num">Weight</th><th class="num">Track</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td class="tok">displayLarge</td><td class="num">34 / 1.14</td><td class="num">700</td><td class="num">−1.0</td><td>The question, feed hero</td></tr>
+          <tr><td class="tok">displayMedium</td><td class="num">28 / 1.20</td><td class="num">700</td><td class="num">−0.6</td><td>Screen titles, stat figures</td></tr>
+          <tr><td class="tok">headlineSmall</td><td class="num">20 / 1.30</td><td class="num">600</td><td class="num">−0.2</td><td>App bars, sheet titles</td></tr>
+          <tr><td class="tok">titleMedium</td><td class="num">16 / 1.40</td><td class="num">600</td><td class="num">0</td><td>Card and tile titles</td></tr>
+          <tr><td class="tok">bodyLarge</td><td class="num">16.5 / 1.60</td><td class="num">400</td><td class="num">0</td><td>Answers, sustained reading</td></tr>
+          <tr><td class="tok">bodyMedium</td><td class="num">14.5 / 1.50</td><td class="num">400</td><td class="num">0</td><td>Default UI text</td></tr>
+          <tr><td class="tok"><strong>bodySmall</strong> ✦</td><td class="num">13 / 1.45</td><td class="num">400</td><td class="num">0</td><td>Captions, help text, meta</td></tr>
+          <tr><td class="tok"><strong>labelLarge</strong> ✦</td><td class="num">12 / 1.20</td><td class="num">700</td><td class="num">+1.2</td><td>Section eyebrows</td></tr>
+          <tr><td class="tok">labelSmall</td><td class="num">10.5 / 1.20</td><td class="num">700</td><td class="num">+1.4</td><td>Chips, tile metadata</td></tr>
+          <tr><td class="tok">monoMedium</td><td class="num">13.5 / 1.50</td><td class="num">400</td><td class="num">0</td><td>Technical detail blocks</td></tr>
+          <tr><td class="tok"><strong>monoSmall</strong> ✦</td><td class="num">12 / 1.45</td><td class="num">400</td><td class="num">0</td><td>Inline data, metric rows</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote" style="margin-top: var(--s3)">✦ new role</p>
+
+    <h3>Space, radius, motion, depth</h3>
+
+    <h4>Spacing — 4pt base</h4>
+    <p>
+      <code>4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64</code>. Two page gutters, each
+      justified by measure rather than preference: <code>gutter = 20</code> for every list
+      and detail screen, <code>gutterReading = 24</code> only where display-size type sets
+      the line length — the feed card and onboarding. Everything else picks the nearest
+      step; 6, 10, 14, 18, 22 and 26 disappear.
+    </p>
+
+    <h4>Radius</h4>
+    <p>
+      <code>sm 8 · md 12 · lg 16 · xl 20 · full 999</code>. 14 and 18 are removed. Cards
+      and sheets take xl, panels and buttons lg, inputs and notices md, inline chips sm.
+    </p>
+
+    <h4>Motion</h4>
+    <p>
+      <code>fast 140ms</code> for state flips, <code>base 220ms</code> for navigation and
+      sheets, <code>reveal 380ms</code> for the one signature moment. Curves:
+      <code>easeOutCubic</code> standard, <code>easeOutQuint</code> for the reveal alone.
+      All three route through a single <code>Motion.of(context)</code> that collapses to
+      <code>Duration.zero</code> when either the app preference or
+      <code>MediaQuery.disableAnimationsOf</code> asks it to — which fixes the two sites
+      that currently ignore the setting.
+    </p>
+
+    <h4>Depth — three tiers, not one</h4>
+    <p>
+      The app is uniformly flat: every surface is elevation 0 with a 1px outline, so a
+      modal sheet, a card and a floating overlay read identically. Three named tiers
+      replace that. <strong>Ground</strong>: scaffold, no border.
+      <strong>Raised</strong>: surface + hairline, still no shadow — cards, panels, tiles.
+      <strong>Overlay</strong>: raised tone + hairline + one soft shadow — sheets, menus,
+      snackbars, the daily strip. In dark mode the overlay tier lifts tone and brightens
+      its border instead of relying on a shadow nobody can see.
+    </p>
+  </section>
+
+  <!-- ══ 4 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>Foundation: the component layer</h2>
+    </div>
+    <p>
+      Ten widgets in <code>lib/app/ui/</code>. Each one exists because the same thing is
+      currently written between two and seven times. This is where the consistency
+      actually becomes structural rather than aspirational.
+    </p>
+
+    <div class="grid" style="margin-top: var(--s5)">
+      <div class="card">
+        <h5>AppPanel</h5>
+        <p>Tinted box + hairline. Variants: <code>plain</code>, <code>mono</code>, <code>notice</code>. <strong>Replaces 7 copies.</strong></p>
+      </div>
+      <div class="card">
+        <h5>AppEmptyState</h5>
+        <p>Icon, title, body, optional action. <strong>Replaces 6 copies.</strong></p>
+      </div>
+      <div class="card">
+        <h5>AppErrorState</h5>
+        <p>Human message, collapsible detail, retry. <strong>Replaces 4 raw dumps + 1 good one.</strong></p>
+      </div>
+      <div class="card">
+        <h5>AppSkeleton</h5>
+        <p>Shimmerless tone-pulse blocks, plus three presets shaped like the feed card, the tile grid and the question list. <strong>Replaces 6 spinners.</strong></p>
+      </div>
+      <div class="card">
+        <h5>MeterRow</h5>
+        <p>Label + 6px track + tabular value, with a real <code>Semantics</code> value. <strong>Replaces 3 implementations.</strong></p>
+      </div>
+      <div class="card">
+        <h5>QuestionTile</h5>
+        <p>The Card + ListTile that opens the deep-dive sheet. <strong>Replaces 3 copies.</strong></p>
+      </div>
+      <div class="card">
+        <h5>CategoryMark</h5>
+        <p>The accent bar + uppercase label lockup. <strong>Replaces 4 copies</strong> across card header, sign-in, splash and explore.</p>
+      </div>
+      <div class="card">
+        <h5>SectionHeader</h5>
+        <p>Eyebrow + optional one-line description, on the standard spacing step.</p>
+      </div>
+      <div class="card">
+        <h5>StatTile</h5>
+        <p>Figure + label, with primary and secondary weights so four numbers stop shouting equally.</p>
+      </div>
+      <div class="card">
+        <h5>AppButton sizes</h5>
+        <p><code>lg 52</code> primary CTA, <code>md 44</code> inline, <code>sm 36</code> in sheets — all still clearing the 44px touch target via padding.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2>Screen by screen</h2>
+    </div>
+
+    <h3>Feed — the one screen that must not change much</h3>
+    <p>
+      It works. Changes are corrective and additive only.
+    </p>
+    <ul>
+      <li>Move the daily strip from a free <code>Positioned</code> overlay into the card's own header row, so it can never collide with the question. It keeps its floating treatment and gains the overlay depth tier.</li>
+      <li>Bookmark and overflow buttons go to full density — 44px targets.</li>
+      <li>Question type steps to <code>displayLarge</code> (34px) and the reading gutter to 24, tuning the measure to ~34 characters per line.</li>
+      <li>The reveal keeps its 380ms expansion but gains a 60ms accent-bar flash on the category mark, so the causal link between tap and reveal is visible at the top of the screen too.</li>
+      <li>Swipe affordance becomes a persistent low-opacity chevron rather than text, and appears only on the first three cards of a session.</li>
+    </ul>
+
+    <h3>Explore — the biggest functional gain</h3>
+    <ul>
+      <li>Tiles become tappable, pushing a filtered question list for that category. This is the missing route from taxonomy to content.</li>
+      <li>Tile rebuilt on <code>Card</code> + <code>InkWell</code>, so it inherits the radius and gets a real press state.</li>
+      <li>Sort by engagement, not enum order, and separate "in progress" from "not started" — 18 identical tiles in declaration order is a wall.</li>
+      <li>Search moves from the app-bar icon to a persistent pinned field, matching Saved, so there is one search pattern.</li>
+      <li>Grid loading becomes a tile skeleton.</li>
+    </ul>
+
+    <h3>Profile → Profile + Settings</h3>
+    <ul>
+      <li>Settings move to their own screen behind a single row. Profile keeps identity, stats, familiarity and History — four blocks instead of eleven decisions.</li>
+      <li>Stats drop to three primaries (Viewed, Completed, Saved) with "Available" demoted to a caption; a catalogue size is context, not an achievement.</li>
+      <li>Familiarity rows use <code>MeterRow</code> and gain semantics.</li>
+      <li>"Delete account" moves to the bottom of Settings, inside a bordered danger region, separated by a full section break — not 10px under Sign out.</li>
+      <li><code>_dailyBudgetLabel()</code>'s hardcoded <code>'40'</code> reads from <code>ai_config.dart</code>.</li>
+    </ul>
+
+    <h3>Practice</h3>
+    <ul>
+      <li>Disabled mode cards drop <code>Opacity</code> for explicit muted tokens, keeping body text above 4.5:1.</li>
+      <li>The grading result gets a clear three-part rhythm — verdict, dimensions, ideal answer — with the score figure at <code>displayMedium</code> and the band label paired with an icon so the verdict is not colour-only.</li>
+      <li>Metric and evaluation rows share <code>MeterRow</code>; the metrics block becomes <code>AppPanel.mono</code>.</li>
+      <li>Grade-scroll animation respects reduced motion.</li>
+    </ul>
+
+    <h3>Saved · Search · History</h3>
+    <ul>
+      <li>All three adopt <code>QuestionTile</code>, so a question looks the same wherever it appears.</li>
+      <li>History status becomes an icon + label chip rather than green text.</li>
+      <li>Search suggestions come from the user's actual most-seen categories rather than a hardcoded eight-term list.</li>
+      <li>All three get skeletons, real empty states and real error states.</li>
+    </ul>
+
+    <h3>Onboarding · Sign-in · Splash</h3>
+    <ul>
+      <li>Page transitions respect reduced motion.</li>
+      <li>Onboarding topic chips show their category colour as a leading dot — the first time the user meets the colour language, which pays off on every later screen.</li>
+      <li>Sign-in gets a proper Google mark asset instead of <code>Icons.g_mobiledata_rounded</code>.</li>
+      <li>Splash and sign-in share the <code>CategoryMark</code> lockup so the transition is genuinely continuous, which the comment already claims it is.</li>
+    </ul>
+
+    <h3>Shell</h3>
+    <ul>
+      <li>Icons standardise on the rounded set throughout, matching the geometry everywhere else.</li>
+      <li>Nav bar takes the overlay depth tier so it separates from the feed's full-bleed ground.</li>
+      <li>A small dot on Practice when review items are due — currently that count is only discoverable by opening the tab.</li>
+    </ul>
+  </section>
+
+  <!-- ══ 6 ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2>Delivery</h2>
+    </div>
+    <p>
+      Five phases, ordered so each one ships something usable on its own and nothing
+      depends on a later phase. Phase 1 alone fixes the blocking accessibility failures.
+    </p>
+
+    <div style="margin-top: var(--s6)">
+
+      <div class="phase">
+        <div class="rail"><div class="dot">1</div><div class="stem"></div></div>
+        <div class="phase-body">
+          <h3>Tokens and the light palette</h3>
+          <p class="tagline">No visual change in dark mode · light mode becomes legible</p>
+          <p>
+            Add <code>app_tokens.dart</code>. Make <code>forCategory</code> brightness-aware
+            with the measured light set. Add the three new type roles. Split the shared
+            DevOps/Cybersecurity hue. Add <code>Motion.of</code>.
+          </p>
+          <div class="files"><span>app_tokens.dart ✦</span><span>app_palette.dart</span><span>app_typography.dart</span><span>app_theme.dart</span></div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">2</div><div class="stem"></div></div>
+        <div class="phase-body">
+          <h3>The component library</h3>
+          <p class="tagline">Ten widgets, no screens touched yet</p>
+          <p>
+            Build all ten in <code>lib/app/ui/</code> against the tokens, with widget tests
+            for the state components. Nothing consumes them yet, so this phase cannot
+            regress anything.
+          </p>
+          <div class="files"><span>app/ui/ ✦</span></div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">3</div><div class="stem"></div></div>
+        <div class="phase-body">
+          <h3>Migration — the deletion phase</h3>
+          <p class="tagline">Expect the diff to be net-negative</p>
+          <p>
+            Replace all seven panels, six empty states, five loading states, four error
+            states, three meter rows and three question tiles with the components. Delete
+            the eleven inline font-size overrides. Snap every remaining spacing and radius
+            value to the scale.
+          </p>
+          <div class="files"><span>all 15 presentation files</span></div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">4</div><div class="stem"></div></div>
+        <div class="phase-body">
+          <h3>Structural fixes</h3>
+          <p class="tagline">The changes users will actually notice</p>
+          <p>
+            Explore tiles become tappable and gain the category question list. Settings
+            split out of Profile. The daily strip moves into the card header. Search
+            unifies. Touch targets, semantics and the icon set are corrected.
+          </p>
+          <div class="files"><span>explore_screen</span><span>profile_screen</span><span>settings_screen ✦</span><span>category_screen ✦</span><span>feed_screen</span><span>question_card</span><span>app_shell</span></div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">5</div><div class="stem"></div></div>
+        <div class="phase-body">
+          <h3>Polish</h3>
+          <p class="tagline">The layer that makes it feel finished</p>
+          <p>
+            Skeletons everywhere, the reveal micro-interaction, the depth tiers, press
+            states, the Google mark, and a full pass in both themes at the largest system
+            text scale.
+          </p>
+          <div class="files"><span>all</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h3>How we'll know it worked</h3>
+    <ul>
+      <li>Zero colour pairs below 4.5:1 for text or 3:1 for non-text, in both themes — re-run the same measurement that produced the tables above.</li>
+      <li>No literal spacing, radius, duration or colour value in any file under <code>features/**/presentation/</code>.</li>
+      <li>Every async surface has all four states, sourced from the shared components.</li>
+      <li>Every interactive target ≥ 44 × 44.</li>
+      <li>Turning on Reduce motion stops every animation in the app, not one.</li>
+      <li>The app is navigable end to end with TalkBack, with meaningful values on all progress meters.</li>
+      <li>No layout breaks at system text scale 2.0.</li>
+    </ul>
+
+    <p class="footnote" style="margin-top: var(--s6)">
+      One thing I'd flag before starting: the dark theme is genuinely well judged, and the
+      temptation in a pass like this is to redesign it because we're in there anyway. The
+      plan deliberately does not. Dark mode changes only where a shared component or a
+      measurement forces it — everything else is the light theme catching up, and the
+      structure catching up with both.
+    </p>
+  </section>
+
+</div>
+
+</body>
+</html>
