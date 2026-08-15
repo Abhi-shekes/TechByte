@@ -126,35 +126,40 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('takes only the height it needs, leaving the rest to the body', (
-      tester,
-    ) async {
-      await setSurface(tester, const Size(390, 844));
-      await tester.pumpWidget(
-        wrap(
-          Scaffold(
-            body: Container(key: const ValueKey('body')),
-            bottomNavigationBar: AppNavBar(
-              currentIndex: 0,
-              destinations: _destinations,
-              onSelected: (_) {},
+    testWidgets(
+      'takes only the height it needs, leaving the rest to the body',
+      (tester) async {
+        await setSurface(tester, const Size(390, 844));
+        await tester.pumpWidget(
+          wrap(
+            Scaffold(
+              body: Container(key: const ValueKey('body')),
+              bottomNavigationBar: AppNavBar(
+                currentIndex: 0,
+                destinations: _destinations,
+                onSelected: (_) {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Scaffold lays the bottom slot out under loose constraints whose
-      // maxHeight is the entire screen — not infinity. Anything in here that
-      // expands to fill (a bare Center, an Expanded, a Column with
-      // MainAxisSize.max) therefore eats the whole viewport and starves the
-      // body, which renders as a navigation bar alone on a blank screen. The
-      // dock's own layout never asserted its height, so exactly that shipped.
-      final dock = tester.getSize(find.byType(AppNavBar));
-      expect(dock.height, lessThan(140), reason: 'the dock swallowed the page');
+        // Scaffold lays the bottom slot out under loose constraints whose
+        // maxHeight is the entire screen — not infinity. Anything in here that
+        // expands to fill (a bare Center, an Expanded, a Column with
+        // MainAxisSize.max) therefore eats the whole viewport and starves the
+        // body, which renders as a navigation bar alone on a blank screen. The
+        // dock's own layout never asserted its height, so exactly that shipped.
+        final dock = tester.getSize(find.byType(AppNavBar));
+        expect(
+          dock.height,
+          lessThan(140),
+          reason: 'the dock swallowed the page',
+        );
 
-      final body = tester.getSize(find.byKey(const ValueKey('body')));
-      expect(body.height, greaterThan(600));
-    });
+        final body = tester.getSize(find.byKey(const ValueKey('body')));
+        expect(body.height, greaterThan(600));
+      },
+    );
 
     testWidgets('divides adjacent destinations with a rule, not a container', (
       tester,
@@ -226,10 +231,7 @@ void main() {
       expect(dock.height, greaterThan(0));
 
       final row = tester.getSize(
-        find.descendant(
-          of: find.byType(AppNavBar),
-          matching: find.byType(Row),
-        ),
+        find.descendant(of: find.byType(AppNavBar), matching: find.byType(Row)),
       );
       expect(
         row.width,
@@ -292,7 +294,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('the active emphasis travels between destinations', (tester) async {
+    testWidgets('the active emphasis travels between destinations', (
+      tester,
+    ) async {
       Widget bar(int index) => wrap(
         Scaffold(
           bottomNavigationBar: AppNavBar(

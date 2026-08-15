@@ -243,7 +243,9 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   static Future<void> _sendTest(BuildContext context, WidgetRef ref) async {
-    final sent = await ref.read(notificationServiceProvider).sendTestNotification();
+    final sent = await ref
+        .read(notificationServiceProvider)
+        .sendTestNotification();
     if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(

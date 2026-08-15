@@ -49,10 +49,15 @@ None of these exist on a fresh clone of this repo. Set them under
 | Secret | Contents |
 |---|---|
 | `GOOGLE_SERVICES_JSON` | `base64 -w0 android/app/google-services.json` |
+| `FIREBASE_OPTIONS_DART` | `base64 -w0 lib/firebase_options.dart` |
 | `RELEASE_KEYSTORE_BASE64` | `base64 -w0 <path to your .jks keystore>` |
 | `RELEASE_KEYSTORE_PASSWORD` | Keystore password |
 | `RELEASE_KEY_ALIAS` | Key alias (`techbyte`, if created via the script below) |
 | `RELEASE_KEY_PASSWORD` | Key password |
+
+`firebase_options.dart` is gitignored (generated locally by
+`flutterfire configure`) but imported by app code, so both CI and the
+release build restore it the same way as `google-services.json`.
 
 Create the keystore with `tools/create_release_keystore.sh` — it also
 registers the SHA-1/SHA-256 fingerprints with Firebase, which Google

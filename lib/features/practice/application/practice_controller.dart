@@ -159,9 +159,8 @@ class PracticeState {
 
   int get completed => scores.length;
 
-  double? get averageScore => scores.isEmpty
-      ? null
-      : scores.reduce((a, b) => a + b) / scores.length;
+  double? get averageScore =>
+      scores.isEmpty ? null : scores.reduce((a, b) => a + b) / scores.length;
 
   double? get bestScore => scores.isEmpty ? null : scores.reduce(max);
 

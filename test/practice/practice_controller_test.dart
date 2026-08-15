@@ -41,7 +41,8 @@ class _AttestationFailure extends GeminiService {
     throw FirebaseException(
       plugin: 'firebase_app_check',
       code: 'unknown',
-      message: 'Error returned from API. code: 403 body: App attestation '
+      message:
+          'Error returned from API. code: 403 body: App attestation '
           'failed.',
     );
   }
@@ -56,7 +57,8 @@ class _AttestationFailure extends GeminiService {
     throw FirebaseException(
       plugin: 'firebase_app_check',
       code: 'unknown',
-      message: 'Error returned from API. code: 403 body: App attestation '
+      message:
+          'Error returned from API. code: 403 body: App attestation '
           'failed.',
     );
   }
