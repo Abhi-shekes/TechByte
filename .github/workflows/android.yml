@@ -5,9 +5,14 @@ name: Android CI
 # This workflow only verifies the code (analyze, test, debug build). It never
 # publishes anything. The signed release build lives in release.yml and fires
 # separately when a dev -> main PR is merged.
+#
+# push is restricted to main only: dev commits are covered by the
+# pull_request trigger below (open a PR to get CI on dev). This avoids a
+# duplicate run for every commit pushed to a branch that already has an open
+# PR against main or dev.
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   pull_request:
     branches: [main, dev]
   workflow_dispatch:
