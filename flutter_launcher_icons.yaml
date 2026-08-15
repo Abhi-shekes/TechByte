@@ -1,0 +1,21 @@
+# Launcher icon generation. Android only — no iOS target exists.
+#
+# Regenerate after changing anything in assets/icon/:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+
+  image_path: "assets/icon/icon.png"
+
+  # Adaptive icon: the launcher masks the foreground to whatever shape the
+  # device theme uses, so the mark is inset and the background is a flat
+  # brand colour rather than part of the artwork.
+  adaptive_icon_background: "#0A0C0F"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+
+  # Monochrome layer for Android 13+ themed icons. Reusing the foreground is
+  # correct here: the system recolours it, so only the silhouette matters.
+  adaptive_icon_monochrome: "assets/icon/icon_foreground.png"
+
+  min_sdk_android: 31

@@ -1,0 +1,29 @@
+# Native splash screen. Android only.
+#
+# Regenerate after changing anything here:
+#   dart run flutter_native_splash:create
+#
+# The colours match AppPalette exactly, so the native splash and the Dart
+# SplashScreen are indistinguishable — the handover between them should not be
+# visible as a flash of a different background.
+flutter_native_splash:
+  color: "#0A0C0F"
+  image: assets/icon/splash.png
+
+  color_dark: "#0A0C0F"
+  image_dark: assets/icon/splash.png
+
+  android: true
+  ios: false
+  web: false
+
+  # Android 12+ draws its own splash from the launcher icon and a background
+  # colour; the legacy image is ignored there, so both are configured.
+  android_12:
+    color: "#0A0C0F"
+    image: assets/icon/icon_foreground.png
+    color_dark: "#0A0C0F"
+    image_dark: assets/icon/icon_foreground.png
+
+  android_gravity: center
+  fullscreen: false
