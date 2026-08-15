@@ -1,0 +1,634 @@
+{
+  "formatVersion": 1,
+  "packId": "core-001",
+  "description": "Hand-written core questions. The voice and quality bar.",
+  "questions": [
+    {
+      "id": "seed_storage_full_slow",
+      "type": "why",
+      "category": "hardware",
+      "subcategory": "ssd",
+      "difficulty": "medium",
+      "question": "Why does your phone get noticeably slower when storage is almost full?",
+      "shortAnswer": "Flash storage can only write to empty blocks. When the drive is nearly full there are few clean blocks left, so every write first has to read a partly-used block, erase it, and rewrite it. One logical write becomes several physical operations.",
+      "whyItMatters": "It explains why \"delete some photos\" genuinely is real advice and not just superstition, and why keeping roughly 10–15% free keeps a device feeling new for years.",
+      "realWorldExample": "A phone at 99% full can take several times longer to save a photo than the same phone at 60%, with identical hardware and software.",
+      "technicalDetails": "NAND flash is written in pages but erased only in much larger blocks. The controller keeps a pool of pre-erased blocks; when that pool runs dry it must do read-modify-erase-write cycles inline. The multiplier between logical and physical writes is called write amplification, and it also consumes the flash's finite erase cycles.",
+      "followUpQuestion": "Why do SSDs need a TRIM command at all?",
+      "tags": [
+        "storage",
+        "flash",
+        "performance"
+      ]
+    },
+    {
+      "id": "seed_usbc_cables_differ",
+      "type": "surprising",
+      "category": "hardware",
+      "subcategory": "usb",
+      "difficulty": "easy",
+      "question": "Why can two USB-C cables that look completely identical behave completely differently?",
+      "shortAnswer": "USB-C standardises only the connector shape, not what is wired inside it. A cable may contain anything from four wires to twenty-four, and may or may not contain an identifier chip. The plug tells you nothing about the capability.",
+      "whyItMatters": "It is why a cable charges your laptop but refuses to drive a monitor, and why the cable bundled with a cheap accessory can bottleneck an expensive device.",
+      "realWorldExample": "A charge-only cable omits the SuperSpeed differential pairs entirely, so it moves power fine and transfers data at USB 2.0 speed — 480 Mbps instead of 10 Gbps.",
+      "technicalDetails": "Full-featured cables carry the CC lines plus four SuperSpeed pairs and include an e-marker chip that reports current capacity, data rate, and alternate-mode support over USB Power Delivery. Without an e-marker, a cable is capped at 3A. DisplayPort Alternate Mode reassigns those SuperSpeed pairs entirely, which is why video needs a cable that physically has them.",
+      "followUpQuestion": "How does a laptop negotiate 100W from a charger without frying a 3A cable?",
+      "tags": [
+        "usb-c",
+        "cables",
+        "power-delivery"
+      ]
+    },
+    {
+      "id": "seed_wifi_slower_than_ethernet",
+      "type": "why",
+      "category": "networking",
+      "subcategory": "wifi",
+      "difficulty": "medium",
+      "question": "Why can Wi-Fi be slower than Ethernet even when both use the exact same internet connection?",
+      "shortAnswer": "Ethernet gives every device its own dedicated wire. Wi-Fi makes every device share one radio channel, and only one device may transmit at a time. Add devices and each one waits longer for a turn.",
+      "whyItMatters": "It reframes home network problems: the fix is usually reducing contention or interference, not buying a faster internet plan.",
+      "realWorldExample": "A video call degrades the moment someone else starts a large upload, because the uploader is now winning most of the airtime on the shared channel.",
+      "technicalDetails": "Wi-Fi uses CSMA/CA: a device listens, waits a random backoff, then transmits and awaits an acknowledgement. Collisions, retries and acknowledgements are pure overhead, so real throughput is often half the advertised PHY rate. A single slow device also drags the channel down by occupying airtime at a low data rate.",
+      "interviewAngle": "A good answer separates bandwidth from airtime, and names the shared-medium contention as the root cause rather than \"interference\".",
+      "followUpQuestion": "Why does one old device slow down the whole Wi-Fi network?",
+      "tags": [
+        "wifi",
+        "ethernet",
+        "csma"
+      ]
+    },
+    {
+      "id": "seed_dns_disappears",
+      "type": "what_happens_if",
+      "category": "internet",
+      "subcategory": "dns",
+      "difficulty": "medium",
+      "question": "If every DNS server on earth went offline for an hour, what would break first?",
+      "shortAnswer": "Almost nothing, for a few minutes. Caches would keep serving known names until their TTLs expired. Then names would start failing in waves, shortest TTL first, and the internet would go dark by name while staying perfectly reachable by IP.",
+      "whyItMatters": "It shows that DNS outages are really cache-expiry events, which is why big DNS incidents get worse over their first several minutes rather than starting at full severity.",
+      "realWorldExample": "Major DNS outages have taken down large parts of the web while the origin servers stayed completely healthy — the content was fine, only the phone book was missing.",
+      "technicalDetails": "Every record carries a TTL, from about 30 seconds for failover-sensitive services to a day or more for stable infrastructure. Resolvers, operating systems and browsers each cache independently, so recovery is also staggered. Services with low TTLs — chosen precisely for fast failover — are the first to break.",
+      "followUpQuestion": "Why do CDNs deliberately use very short DNS TTLs?",
+      "tags": [
+        "dns",
+        "caching",
+        "ttl"
+      ]
+    },
+    {
+      "id": "seed_type_google_com",
+      "type": "interview",
+      "category": "internet",
+      "subcategory": "http",
+      "difficulty": "hard",
+      "question": "What actually happens between pressing Enter on google.com and seeing the page?",
+      "shortAnswer": "The name is resolved to an address, a TCP connection is opened and secured with TLS, an HTTP request goes out, the server responds with HTML, and the browser then fetches sub-resources and paints — with caches short-circuiting almost every one of those steps.",
+      "whyItMatters": "It is the canonical systems interview question because it touches DNS, transport, cryptography, HTTP semantics and rendering in one narrative.",
+      "realWorldExample": "On a warm cache with an existing connection, the whole sequence can complete in well under 100 ms; cold, it can take ten times that.",
+      "technicalDetails": "Browser cache, then OS cache, then resolver for DNS. TCP handshake (or QUIC, which folds transport and crypto together), then TLS with SNI and ALPN. Request, then response, then the parser builds the DOM, discovers sub-resources, blocks on synchronous scripts, computes layout and paints. HTTP/2 and HTTP/3 multiplex sub-resources over the one connection.",
+      "interviewAngle": "Interviewers listen for whether you know where the caches are and can name what happens concurrently versus sequentially. Depth in one layer beats a shallow tour of all of them.",
+      "followUpQuestion": "Why did HTTP/3 abandon TCP entirely in favour of QUIC over UDP?",
+      "tags": [
+        "http",
+        "dns",
+        "tls",
+        "interview"
+      ]
+    },
+    {
+      "id": "seed_ram_vs_storage",
+      "type": "why",
+      "category": "hardware",
+      "subcategory": "ram",
+      "difficulty": "medium",
+      "question": "Why can't your phone just use its storage as RAM when it runs out of memory?",
+      "shortAnswer": "It can, and it does — but storage is roughly a thousand times slower to reach and cannot be addressed in the small pieces the CPU needs. Using it as memory turns a nanosecond operation into a microsecond one.",
+      "whyItMatters": "It explains why extra storage never substitutes for RAM, and why a phone with lots of free space still kills your background apps.",
+      "realWorldExample": "Android compresses inactive app memory in RAM rather than swapping to flash, precisely because reading it back from flash would be too slow and would wear the chip.",
+      "technicalDetails": "DRAM access is around 50–100 ns with byte-level addressing. NAND is tens of microseconds and can only be read and written in pages of several kilobytes. The CPU needs individual bytes on demand, so anything not in RAM must be faulted in a whole page at a time.",
+      "followUpQuestion": "Why does Android compress memory instead of swapping to storage?",
+      "tags": [
+        "ram",
+        "storage",
+        "memory"
+      ]
+    },
+    {
+      "id": "seed_cpu_cache_exists",
+      "type": "why",
+      "category": "computer_science",
+      "subcategory": "cpu",
+      "difficulty": "medium",
+      "question": "Why doesn't the CPU simply read RAM every time it needs a value?",
+      "shortAnswer": "Because RAM is roughly two hundred cycles away. A modern CPU would spend most of its life waiting. Small fast caches sit in between and answer the overwhelming majority of requests in a few cycles.",
+      "whyItMatters": "Cache behaviour, not instruction count, is what makes most real programs fast or slow — which is why memory layout often beats algorithmic cleverness.",
+      "realWorldExample": "Summing a two-dimensional array row by row can be several times faster than column by column. Identical work, identical complexity — one walks memory in order and one does not.",
+      "technicalDetails": "L1 is ~4 cycles, L2 ~12, L3 ~40, DRAM ~200+. Caches load 64-byte lines, so touching one byte fetches its neighbours; sequential access gets the rest almost free. The hardware prefetcher also predicts linear strides, which is exactly what column-major traversal defeats.",
+      "interviewAngle": "Being able to explain why an O(n) array scan beats an O(n) linked-list walk demonstrates you think about hardware, not just complexity classes.",
+      "followUpQuestion": "Why can two threads writing to nearby variables destroy performance?",
+      "tags": [
+        "cache",
+        "cpu",
+        "performance"
+      ]
+    },
+    {
+      "id": "seed_closing_apps_battery",
+      "type": "myth_fact",
+      "category": "mobile",
+      "subcategory": "android",
+      "difficulty": "easy",
+      "question": "Does swiping Android apps out of the recents list actually save battery?",
+      "shortAnswer": "Usually the opposite. A cached app costs almost nothing because it is frozen and consumes no CPU. Killing it throws away that work, and relaunching from scratch burns noticeably more energy than leaving it alone.",
+      "whyItMatters": "It is one of the most widely believed pieces of phone folklore, and acting on it makes the phone slower and shorter-lived on a charge.",
+      "realWorldExample": "Force-closing a messaging app you use hourly means paying full cold-start cost every time, instead of a near-instant resume from memory.",
+      "technicalDetails": "Android freezes cached processes so they get no CPU scheduling. Free RAM is wasted RAM; the low-memory killer reclaims processes on demand by priority. Battery drain comes from wakelocks, background jobs, radio use and GPS — none of which are stopped by having a card in the recents list.",
+      "followUpQuestion": "What does actually drain your battery in the background, then?",
+      "tags": [
+        "android",
+        "battery",
+        "myth"
+      ]
+    },
+    {
+      "id": "seed_gps_no_transmit",
+      "type": "how",
+      "category": "real_world_tech",
+      "subcategory": "gps",
+      "difficulty": "medium",
+      "question": "How does GPS know where you are if your phone never transmits anything to the satellites?",
+      "shortAnswer": "GPS is receive-only. Satellites continuously broadcast the time and their own position; your phone measures how long each signal took to arrive and solves for the one point on earth consistent with all of them.",
+      "whyItMatters": "It means GPS works for unlimited users at once, cannot be \"used up\", and reveals nothing about you to the satellites — tracking comes from apps, not from GPS itself.",
+      "realWorldExample": "A GPS receiver in airplane mode still knows exactly where it is, which is how offline navigation apps work with no signal at all.",
+      "technicalDetails": "Each satellite carries an atomic clock and broadcasts a timestamped signal. Distance is the flight time times c. Three ranges would fix a position if your clock were perfect; because it is not, a fourth satellite is used to solve for the receiver clock error as an unknown. That trick lets a cheap quartz phone clock achieve nanosecond effective accuracy.",
+      "followUpQuestion": "Why does GPS need to correct for relativity to stay accurate?",
+      "tags": [
+        "gps",
+        "satellites",
+        "trilateration"
+      ]
+    },
+    {
+      "id": "seed_restart_fixes",
+      "type": "why",
+      "category": "operating_systems",
+      "subcategory": "processes",
+      "difficulty": "easy",
+      "question": "Why does restarting a computer fix so many problems that nothing else fixes?",
+      "shortAnswer": "Because it discards all accumulated state. Most stubborn faults are corrupted in-memory state — leaked handles, stale caches, wedged locks — and a restart returns the machine to the one configuration that was actually tested.",
+      "whyItMatters": "It is also why \"have you tried turning it off and on again\" became real engineering practice: modern systems restart unhealthy components deliberately rather than trying to repair them.",
+      "realWorldExample": "Kubernetes does exactly this at scale. A failing liveness probe restarts the container instead of diagnosing it, because a clean process is cheaper and more reliable than a repaired one.",
+      "technicalDetails": "Long-running processes accumulate leaked memory, exhausted file descriptors, deadlocked threads and caches that no longer match reality. None of that survives process death. The state space of a freshly booted system is tiny compared with one that has been running for weeks, and it is the state actually covered by testing.",
+      "followUpQuestion": "What is the difference between a crash loop and a healthy restart?",
+      "tags": [
+        "state",
+        "reliability",
+        "processes"
+      ]
+    },
+    {
+      "id": "seed_udp_over_tcp",
+      "type": "compare",
+      "category": "networking",
+      "subcategory": "tcp",
+      "difficulty": "medium",
+      "question": "Why would anyone choose UDP when TCP guarantees delivery for free?",
+      "shortAnswer": "Because the guarantee is not free — it is paid for in time. TCP delivers bytes strictly in order, so one lost packet stalls everything behind it. For live audio and video, arriving late is worse than not arriving.",
+      "whyItMatters": "It is the reason voice calls, games and modern web transport all run on UDP: they would rather drop 20 ms of audio than freeze the whole stream to recover it.",
+      "realWorldExample": "On a call, a lost packet becomes a tiny glitch you barely notice. Over TCP the same loss would stall the audio for a retransmission round trip and then play it back late.",
+      "technicalDetails": "TCP's in-order delivery causes head-of-line blocking: segment N+1 waits in the buffer until N is retransmitted. QUIC runs over UDP and rebuilds reliability per-stream, so loss in one stream no longer blocks the others — which is exactly the flaw HTTP/2 over TCP could not fix.",
+      "interviewAngle": "Naming head-of-line blocking, rather than just \"UDP is faster\", is what separates a memorised answer from an understood one.",
+      "followUpQuestion": "How does QUIC get reliability without TCP?",
+      "tags": [
+        "tcp",
+        "udp",
+        "quic"
+      ]
+    },
+    {
+      "id": "seed_index_slower",
+      "type": "surprising",
+      "category": "databases",
+      "subcategory": "sql",
+      "difficulty": "hard",
+      "question": "Why can adding an index make your database slower instead of faster?",
+      "shortAnswer": "Every index is a second structure that must be updated on every insert, update and delete. Indexes speed up reads and tax writes, and a low-selectivity index can be worse than useless — the planner may use it and do more work than a plain scan.",
+      "whyItMatters": "Adding indexes is the default reflex for slow queries, and on write-heavy tables it is a common way to make an outage worse.",
+      "realWorldExample": "Indexing a boolean \"is_active\" column where 95% of rows are active means the planner reads most of the index and then most of the table — strictly more I/O than just reading the table.",
+      "technicalDetails": "A B-tree index costs an extra write path, page splits and WAL volume per row change. The planner chooses an index scan based on estimated selectivity; when a match returns a large fraction of rows, random heap lookups per match cost far more than one sequential scan. Stale statistics make it pick wrongly.",
+      "interviewAngle": "The strong answer covers write amplification, selectivity, and the fact that the planner's decision depends on statistics that can go stale.",
+      "followUpQuestion": "Why does a query suddenly get slow after a large bulk insert?",
+      "tags": [
+        "indexes",
+        "sql",
+        "query-planner"
+      ]
+    },
+    {
+      "id": "seed_api_slow_low_cpu",
+      "type": "production",
+      "category": "backend",
+      "subcategory": "api",
+      "difficulty": "hard",
+      "question": "Why would an API slow from 100 ms to 4 seconds while CPU stays at 25%?",
+      "shortAnswer": "Because it is waiting, not computing. Low CPU with high latency almost always means contention for a limited resource — a connection pool, a lock, a downstream call — where requests queue instead of consuming cycles.",
+      "whyItMatters": "CPU and memory dashboards look healthy during most latency incidents, which is why teams stare at green graphs while users time out.",
+      "realWorldExample": "A pool of 10 database connections serving 200 concurrent requests means 190 requests sitting in a queue. The database is idle, the app is idle, and every user waits.",
+      "technicalDetails": "Check saturation, not utilisation: pool wait time, queue depth, thread-pool exhaustion, downstream p99, and lock contention. Little's Law explains the shape — latency rises non-linearly as concurrency approaches the pool limit. A single slow dependency propagates backwards into every caller holding a connection while it waits.",
+      "interviewAngle": "Strong candidates ask what the service is waiting *on* before proposing scaling, and know that adding instances can make pool exhaustion worse downstream.",
+      "followUpQuestion": "Why can adding more application servers make a latency problem worse?",
+      "tags": [
+        "latency",
+        "connection-pool",
+        "production"
+      ]
+    },
+    {
+      "id": "seed_kafka_consumer_crash",
+      "type": "behind_the_scenes",
+      "category": "distributed_systems",
+      "subcategory": "kafka",
+      "difficulty": "hard",
+      "question": "What happens to in-flight messages when a Kafka consumer crashes mid-batch?",
+      "shortAnswer": "Nothing is lost — but work is repeated. Kafka does not delete consumed messages; it tracks an offset. On crash the group rebalances and another consumer resumes from the last committed offset, replaying everything processed after it.",
+      "whyItMatters": "It is why Kafka consumers must be idempotent. \"At least once\" is the default, so duplicate processing is a certainty, not an edge case.",
+      "realWorldExample": "A payment consumer that commits offsets after processing will re-process the last batch on crash. Without an idempotency key, that charges customers twice.",
+      "technicalDetails": "Offsets are stored in an internal topic. Committing before processing gives at-most-once (loss); after processing gives at-least-once (duplicates). Exactly-once needs transactional producers plus read-committed consumers, and only within Kafka. Rebalances also pause the whole group, so a slow consumer exceeding max.poll.interval.ms gets evicted and triggers another rebalance.",
+      "interviewAngle": "The insight interviewers want is that delivery semantics are chosen by *where you commit*, and that exactly-once end-to-end usually means idempotency, not magic.",
+      "followUpQuestion": "Why can a slow consumer trigger an endless rebalance loop?",
+      "tags": [
+        "kafka",
+        "offsets",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "seed_llm_nondeterministic",
+      "type": "why",
+      "category": "ai_ml",
+      "subcategory": "llms",
+      "difficulty": "medium",
+      "question": "Why does a language model give different answers to the exact same question?",
+      "shortAnswer": "Because it does not pick the best next token — it samples from a probability distribution over all of them. Unless sampling is disabled, identical input takes a different random path every time.",
+      "whyItMatters": "It explains why AI features need validation and caching rather than trust, and why \"it worked when I tested it\" is not evidence that a prompt is reliable.",
+      "realWorldExample": "The same prompt run five times can produce five differently structured answers, which is exactly why this app validates model output against a schema before showing it.",
+      "technicalDetails": "The model outputs logits over the vocabulary; temperature scales them and top-k/top-p truncate the tail before sampling. Temperature 0 is near-greedy and mostly reproducible, but batching, floating-point non-associativity on GPUs and mixture-of-experts routing can still introduce variation.",
+      "followUpQuestion": "Why does temperature 0 still not guarantee identical output?",
+      "tags": [
+        "llm",
+        "sampling",
+        "temperature"
+      ]
+    },
+    {
+      "id": "seed_vector_db_why",
+      "type": "why",
+      "category": "ai_ml",
+      "subcategory": "embeddings",
+      "difficulty": "medium",
+      "question": "Why do vector databases exist when SQL databases have had indexes for decades?",
+      "shortAnswer": "Because B-trees index exact and ordered values, and embeddings need nearest-neighbour search in hundreds of dimensions. There is no ordering to sort by, and in high dimensions every point is roughly equidistant from every other.",
+      "whyItMatters": "It is the difference between \"find rows where category = X\" and \"find the rows that mean something similar to this sentence\" — a query type traditional indexes simply cannot express.",
+      "realWorldExample": "Searching \"how do I stop my app crashing\" should surface a document titled \"handling uncaught exceptions\" — zero keywords in common, near-identical meaning.",
+      "technicalDetails": "Exact nearest-neighbour degrades to a full scan as dimensionality grows, so vector databases use approximate indexes such as HNSW or IVF that trade a little recall for orders-of-magnitude speed. Postgres can do this too via pgvector, which is why \"vector database\" is often a feature rather than a separate product.",
+      "followUpQuestion": "Why is approximate search acceptable for retrieval?",
+      "tags": [
+        "embeddings",
+        "vector-search",
+        "rag"
+      ]
+    },
+    {
+      "id": "seed_hashed_passwords_leak",
+      "type": "why",
+      "category": "cybersecurity",
+      "subcategory": "hashing",
+      "difficulty": "medium",
+      "question": "Why does a password leak still matter if all the passwords were hashed?",
+      "shortAnswer": "Because hashing is not encryption — it is a one-way function anyone can run. An attacker with the hashes can guess billions of candidate passwords offline and keep every one that matches.",
+      "whyItMatters": "It is why the hash algorithm matters enormously, and why reusing a password across sites turns one company's breach into your problem everywhere.",
+      "realWorldExample": "Consumer GPUs can compute billions of MD5 or SHA-1 hashes per second. A leaked SHA-1 database of common passwords is effectively plaintext within hours.",
+      "technicalDetails": "Fast general-purpose hashes are the wrong tool. Password hashes must be deliberately slow and memory-hard — bcrypt, scrypt, Argon2 — with a unique per-user salt to defeat rainbow tables and prevent one crack from covering every user who chose the same password.",
+      "interviewAngle": "Saying \"we hash passwords\" is not an answer. Naming a memory-hard algorithm plus per-user salts, and explaining why speed is the vulnerability, is.",
+      "followUpQuestion": "Why must a password hash be deliberately slow?",
+      "tags": [
+        "hashing",
+        "passwords",
+        "security"
+      ]
+    },
+    {
+      "id": "seed_https_public_wifi",
+      "type": "how",
+      "category": "cybersecurity",
+      "subcategory": "tls",
+      "difficulty": "medium",
+      "question": "What actually stops someone on the same café Wi-Fi from reading your HTTPS traffic?",
+      "shortAnswer": "A key they never see. Your browser and the server derive a shared secret over the open network using maths that an eavesdropper cannot reverse, and a certificate proves the server is who it claims to be.",
+      "whyItMatters": "It is why public Wi-Fi is no longer inherently dangerous for browsing, and why a certificate warning is the one alert you should never click through.",
+      "realWorldExample": "Someone capturing all packets on that network sees which host you connected to, and an opaque stream of bytes for everything after.",
+      "technicalDetails": "TLS uses ephemeral Diffie-Hellman so the session key is never transmitted and is discarded afterwards — capturing traffic today and stealing the server key later still does not decrypt it. The certificate chain binds the key to the hostname; an attacker without a trusted-CA certificate cannot impersonate the server without triggering a warning.",
+      "followUpQuestion": "What does an eavesdropper still learn about you despite HTTPS?",
+      "tags": [
+        "tls",
+        "https",
+        "encryption"
+      ]
+    },
+    {
+      "id": "seed_cloud_egress",
+      "type": "surprising",
+      "category": "cloud",
+      "subcategory": "storage",
+      "difficulty": "medium",
+      "question": "Why is cloud storage cheap to write to and expensive to read from?",
+      "shortAnswer": "Storing bytes is nearly free and getting cheaper. Moving them out of the provider's network is billed per gigabyte — and that price has barely moved in years, because it is a business decision, not a cost.",
+      "whyItMatters": "Egress fees are the single most underestimated line in a cloud bill, and the main reason migrating away from a provider is expensive.",
+      "realWorldExample": "A backup archive can cost a few rupees a month to store and a large multiple of that to download once in a restore drill.",
+      "technicalDetails": "Ingress is typically free, inter-region and internet egress are not. This is why CDNs pay for themselves, why architectures keep compute in the same region as data, and why \"data gravity\" is a real constraint: the data stops being portable long before it stops being useful.",
+      "followUpQuestion": "Why do providers charge nothing to upload but a lot to download?",
+      "tags": [
+        "cloud",
+        "egress",
+        "cost"
+      ]
+    },
+    {
+      "id": "seed_works_locally_dies_prod",
+      "type": "production",
+      "category": "devops",
+      "subcategory": "docker",
+      "difficulty": "medium",
+      "question": "Why does a container that runs perfectly on your laptop die immediately in production?",
+      "shortAnswer": "Because the container image was never the whole environment. Configuration, secrets, network policy, filesystem permissions, resource limits and CPU architecture all live outside the image, and all of them differ.",
+      "whyItMatters": "It punctures the idea that containers guarantee parity. They standardise the filesystem, not the world the process runs in.",
+      "realWorldExample": "An image built on an Apple Silicon laptop is arm64 and simply will not start on an amd64 node — a failure that cannot reproduce locally by definition.",
+      "technicalDetails": "Common causes: memory limits triggering OOMKill under real load, read-only root filesystems, non-root user IDs lacking write access to a mounted volume, missing environment variables, and DNS or egress rules that do not exist on a laptop. The clue is usually in the exit code — 137 is a kill signal, not a bug in your code.",
+      "followUpQuestion": "What does exit code 137 tell you immediately?",
+      "tags": [
+        "docker",
+        "containers",
+        "production"
+      ]
+    },
+    {
+      "id": "seed_k8s_restarting_pod",
+      "type": "debugging",
+      "category": "devops",
+      "subcategory": "kubernetes",
+      "difficulty": "hard",
+      "question": "Kubernetes keeps restarting a pod that is not crashing. What is going on?",
+      "shortAnswer": "Kubernetes is killing it. A failing liveness probe restarts a container that is running fine but not answering the probe in time — usually because it is slow to start or briefly too busy to respond.",
+      "whyItMatters": "A misconfigured probe turns a temporary slowdown into a permanent restart loop, and the restarts make the load worse on every surviving replica.",
+      "realWorldExample": "An app that needs 40 seconds to warm its cache, with a liveness probe that starts checking at 10 seconds, will be killed before it ever becomes ready — forever.",
+      "technicalDetails": "Liveness restarts the container; readiness only removes it from the Service endpoints. Slow starts belong to a startup probe, not a longer liveness delay. Check `kubectl describe pod` for the event and last state: OOMKilled means the memory limit, not the probe. A probe that hits the same thread pool as real traffic will fail exactly when you least want a restart.",
+      "interviewAngle": "Knowing the difference between liveness, readiness and startup probes — and that liveness is a *restart* trigger — is the whole question.",
+      "followUpQuestion": "When should a service fail its readiness probe on purpose?",
+      "tags": [
+        "kubernetes",
+        "probes",
+        "debugging"
+      ]
+    },
+    {
+      "id": "seed_float_point_math",
+      "type": "why",
+      "category": "programming",
+      "subcategory": "numbers",
+      "difficulty": "easy",
+      "question": "Why does 0.1 + 0.2 not equal 0.3 in almost every language?",
+      "shortAnswer": "Because 0.1 and 0.2 do not exist in binary. They are infinitely repeating fractions in base 2, so the computer stores the nearest representable values and the tiny errors survive the addition.",
+      "whyItMatters": "It is the reason money must never be stored in a float, and the source of a whole class of bugs that only appear in aggregate.",
+      "realWorldExample": "Summing thousands of float prices drifts by a visible amount, which is why financial systems use integer minor units or a decimal type.",
+      "technicalDetails": "IEEE-754 doubles have a 53-bit significand. One tenth in binary is 0.0001100110011… repeating, exactly as one third is 0.333… in decimal. The result of 0.1 + 0.2 is 0.30000000000000004, and equality comparison on floats is therefore almost always the wrong operation.",
+      "followUpQuestion": "Why is 0.5 stored perfectly when 0.1 cannot be?",
+      "tags": [
+        "floating-point",
+        "ieee754",
+        "numbers"
+      ]
+    },
+    {
+      "id": "seed_gc_memory_leak",
+      "type": "surprising",
+      "category": "programming",
+      "subcategory": "memory",
+      "difficulty": "hard",
+      "question": "Why can a garbage-collected program still leak memory until it crashes?",
+      "shortAnswer": "Because the collector frees what is *unreachable*, not what is unused. Anything still referenced is kept forever, even if the program will never touch it again.",
+      "whyItMatters": "It moves the burden from \"remember to free\" to \"remember to unregister\", and the second mistake is far harder to see in a code review.",
+      "realWorldExample": "A listener added on every screen open and never removed keeps every one of those screens — and everything they reference — alive for the life of the process.",
+      "technicalDetails": "Classic sources: growing caches with no eviction, static collections, event listeners and stream subscriptions never cancelled, and closures capturing more than intended. The fix is scoped ownership — cancel in dispose, use weak references for observers, bound every cache. A heap dump showing retained paths tells you who is holding the reference.",
+      "interviewAngle": "Stating the reachable-versus-used distinction up front shows you understand what a GC actually promises.",
+      "followUpQuestion": "How would you find which object is holding a reference?",
+      "tags": [
+        "garbage-collection",
+        "memory-leak",
+        "listeners"
+      ]
+    },
+    {
+      "id": "seed_fast_charging_heat",
+      "type": "why",
+      "category": "electronics",
+      "subcategory": "batteries",
+      "difficulty": "easy",
+      "question": "Why does your phone get hot specifically during fast charging?",
+      "shortAnswer": "Because pushing power quickly means pushing current through resistance, and the heat generated rises with the square of the current. Doubling the charging speed roughly quadruples the losses.",
+      "whyItMatters": "Heat, not charge cycles, is the main thing that ages a lithium battery — which is why fast charging trades long-term capacity for short-term convenience.",
+      "realWorldExample": "Chargers raise voltage rather than current where they can, precisely because higher voltage at the same power means less current and far less heat.",
+      "technicalDetails": "Resistive loss is I²R. Internal cell resistance, the conversion circuitry and the cable all contribute. This is why phones fast-charge only to about 80% and then taper — the final stage is constant-voltage, where the chemistry cannot safely absorb current quickly, and where heat does the most damage.",
+      "followUpQuestion": "Why does the last 20% of a charge always take so much longer?",
+      "tags": [
+        "battery",
+        "charging",
+        "heat"
+      ]
+    },
+    {
+      "id": "seed_gpu_beats_cpu_ai",
+      "type": "compare",
+      "category": "hardware",
+      "subcategory": "gpu",
+      "difficulty": "medium",
+      "question": "Why is a GPU so much better at AI than a CPU when its individual cores are far weaker?",
+      "shortAnswer": "Because neural networks are almost entirely matrix multiplication — the same operation over enormous amounts of data. A CPU has a few very clever cores; a GPU has thousands of simple ones doing identical work in lockstep.",
+      "whyItMatters": "It explains why the AI boom is a hardware story, and why the scarce resource is memory bandwidth as much as raw compute.",
+      "realWorldExample": "A CPU might finish a large training step in hours where a GPU takes minutes, despite the CPU having far higher single-thread performance.",
+      "technicalDetails": "GPUs execute one instruction across many data elements at once, hiding memory latency by swapping between thousands of resident threads instead of using deep caches. Tensor cores go further with dedicated matrix-multiply-accumulate units. The trade-off is rigidity: branchy, sequential, unpredictable code runs badly, which is exactly what CPUs are built for.",
+      "followUpQuestion": "Why is memory bandwidth, not FLOPS, often the real limit in inference?",
+      "tags": [
+        "gpu",
+        "parallelism",
+        "ai"
+      ]
+    },
+    {
+      "id": "seed_swap_with_free_ram",
+      "type": "surprising",
+      "category": "operating_systems",
+      "subcategory": "linux",
+      "difficulty": "hard",
+      "question": "Why does a machine with plenty of free RAM still write pages to swap?",
+      "shortAnswer": "Because idle memory is wasted memory. The kernel proactively evicts pages nothing has touched in a long time so it can use that RAM for disk cache, which benefits everything actually running.",
+      "whyItMatters": "Swap usage is routinely misread as a memory shortage, prompting people to disable swap — which removes the kernel's cheapest option and makes real pressure much worse.",
+      "realWorldExample": "A server up for months shows a few hundred megabytes swapped and zero performance problem: those are startup pages never read again since boot.",
+      "technicalDetails": "The `swappiness` tunable balances evicting anonymous pages against dropping page cache. Swap *usage* is harmless; swap *activity* — sustained page-in and page-out — is the symptom that matters, and si/so in vmstat is what to watch, not the total.",
+      "interviewAngle": "The distinction between swap used and swap thrashing is a quick signal of real operational experience.",
+      "followUpQuestion": "Why can disabling swap entirely make an OOM situation worse?",
+      "tags": [
+        "swap",
+        "linux",
+        "memory"
+      ]
+    },
+    {
+      "id": "seed_bandwidth_vs_latency",
+      "type": "why",
+      "category": "networking",
+      "subcategory": "latency",
+      "difficulty": "medium",
+      "question": "Why doesn't upgrading to a much faster internet plan make websites load noticeably faster?",
+      "shortAnswer": "Because page loads are limited by round trips, not by capacity. Beyond roughly 10 Mbps you are mostly waiting for light to travel and for handshakes to complete — and no plan makes distance shorter.",
+      "whyItMatters": "It is why CDNs and connection reuse improve real speed while bandwidth upgrades stop helping, and why bandwidth is the number that gets marketed anyway.",
+      "realWorldExample": "Going from 100 Mbps to 1 Gbps barely changes page load time. Moving the server from another continent to a nearby edge location changes it dramatically.",
+      "technicalDetails": "DNS, TCP and TLS each cost round trips before the first byte of content moves. A 200 ms RTT makes those handshakes cost most of a second regardless of bandwidth. HTTP/2 multiplexing, connection reuse, TLS resumption and QUIC's 0-RTT all attack round trips — the actual constraint.",
+      "followUpQuestion": "Why does bandwidth still matter enormously for video streaming?",
+      "tags": [
+        "latency",
+        "bandwidth",
+        "rtt"
+      ]
+    },
+    {
+      "id": "seed_cdn_distance",
+      "type": "how",
+      "category": "internet",
+      "subcategory": "cdn",
+      "difficulty": "medium",
+      "question": "How does a website load quickly in Sydney when its only server is in Virginia?",
+      "shortAnswer": "It doesn't — you are not reaching Virginia. A copy of the content sits on a server a few milliseconds away, and DNS or anycast routing quietly sent you there instead.",
+      "whyItMatters": "Physics sets a floor on latency that no amount of money removes. The only real fix is to stop making the request travel that far.",
+      "realWorldExample": "Sydney to Virginia and back is roughly 200 ms at best. An edge cache turns that into single-digit milliseconds for anything static.",
+      "technicalDetails": "CDNs use anycast — the same IP announced from many locations, with BGP routing you to the nearest — or geo-aware DNS. Static assets are cached at the edge; dynamic requests still travel to origin, which is why a CDN speeds up images far more than a personalised dashboard.",
+      "followUpQuestion": "How does anycast send two people to different servers using one IP?",
+      "tags": [
+        "cdn",
+        "anycast",
+        "latency"
+      ]
+    },
+    {
+      "id": "seed_transactions_wrong_result",
+      "type": "what_happens_if",
+      "category": "databases",
+      "subcategory": "transactions",
+      "difficulty": "expert",
+      "question": "How can two individually correct database transactions still produce a wrong final result?",
+      "shortAnswer": "Because most databases do not run transactions one at a time. At the usual isolation levels, two transactions can each read valid data, each make a valid decision, and both commit — producing a state neither would have allowed alone.",
+      "whyItMatters": "It is the source of double bookings, oversold inventory and negative balances in systems where every individual query is provably correct.",
+      "realWorldExample": "Two requests both read \"1 seat left\", both decide the booking is fine, and both commit. Two people now hold the same seat.",
+      "technicalDetails": "This is write skew, and read-committed or repeatable-read will not prevent it. Fixes: serializable isolation, an explicit row lock via SELECT … FOR UPDATE, an atomic conditional update, or a uniqueness constraint that makes the invalid state unrepresentable. The last is the most robust, because it does not depend on every code path remembering.",
+      "interviewAngle": "Naming the isolation level and offering more than one remedy — locking, serializable, constraint — is what a strong answer looks like.",
+      "followUpQuestion": "Why is a database constraint safer than a check in application code?",
+      "tags": [
+        "transactions",
+        "isolation",
+        "race-condition"
+      ]
+    },
+    {
+      "id": "seed_git_never_deletes",
+      "type": "behind_the_scenes",
+      "category": "developer_tools",
+      "subcategory": "git",
+      "difficulty": "medium",
+      "question": "Why is it so hard to actually lose a commit in Git, even after a hard reset?",
+      "shortAnswer": "Because commits are immutable objects addressed by their content hash, and branches are just movable labels. Resetting moves the label; the commit is still sitting in the object database, unreferenced but intact.",
+      "whyItMatters": "It turns Git's scariest commands into recoverable ones, provided you know where the old positions were recorded.",
+      "realWorldExample": "`git reflog` lists every position HEAD has held for weeks. Finding the hash from before a bad reset and checking it out restores the work in seconds.",
+      "technicalDetails": "Objects live in .git/objects keyed by SHA. Unreferenced objects survive until garbage collection, which by default leaves them for about 30 days. The reflog records local HEAD and branch movements — including ones never pushed — which is why it recovers things no remote ever saw. Genuinely losing work usually means never having committed it at all.",
+      "followUpQuestion": "Why does rebasing create entirely new commits rather than moving them?",
+      "tags": [
+        "git",
+        "reflog",
+        "objects"
+      ]
+    },
+    {
+      "id": "seed_on2_beats_nlogn",
+      "type": "surprising",
+      "category": "computer_science",
+      "subcategory": "algorithms",
+      "difficulty": "medium",
+      "question": "Why can an O(n²) algorithm consistently beat an O(n log n) one in production?",
+      "shortAnswer": "Because big-O hides constants, and constants are where the hardware lives. For small inputs a simple algorithm with sequential memory access and no allocation wins easily.",
+      "whyItMatters": "It is why real standard libraries are hybrids, and why \"use the better complexity\" is advice about scale, not about speed.",
+      "realWorldExample": "Production sort implementations switch to insertion sort below roughly 16–32 elements — an O(n²) algorithm chosen deliberately for being faster there.",
+      "technicalDetails": "Insertion sort touches memory sequentially, branch-predicts well and allocates nothing. Merge sort allocates and copies; quicksort recurses and pays call overhead. Crossover typically sits in the tens of elements. Timsort and introsort formalise this by starting with the asymptotically worse algorithm on purpose.",
+      "interviewAngle": "Mentioning cache behaviour and constant factors — not just \"n is small\" — is what makes this answer land.",
+      "followUpQuestion": "Why is quicksort usually faster than merge sort in practice?",
+      "tags": [
+        "algorithms",
+        "big-o",
+        "cache"
+      ]
+    },
+    {
+      "id": "seed_upi_two_seconds",
+      "type": "behind_the_scenes",
+      "category": "real_world_tech",
+      "subcategory": "payments",
+      "difficulty": "hard",
+      "question": "What actually happens in the two seconds between tapping Pay on UPI and seeing \"Success\"?",
+      "shortAnswer": "Your PIN is encrypted on-device and never seen by the app, a request is routed through the UPI switch to both banks, the payer's account is debited and the payee credited, and every party is notified — as one coordinated transaction across separate institutions.",
+      "whyItMatters": "It is one of the highest-volume real-time payment systems in the world, and it works between banks that share no database.",
+      "realWorldExample": "Money leaves one bank and appears in another in about a second, with no shared ledger and no batch settlement in between.",
+      "technicalDetails": "The PSP app captures the PIN inside a bank-controlled secure component and encrypts it with the issuing bank's key, so neither the app nor the switch can read it. NPCI's switch resolves the VPA to an account, orchestrates debit and credit legs, and handles timeouts and reversals. Inter-bank settlement happens later; the customer-visible transaction is confirmed immediately, which is why \"pending\" states and auto-reversals exist.",
+      "followUpQuestion": "What happens if the debit succeeds but the credit fails?",
+      "tags": [
+        "upi",
+        "payments",
+        "distributed-transactions"
+      ]
+    },
+    {
+      "id": "seed_oled_dark_mode",
+      "type": "compare",
+      "category": "electronics",
+      "subcategory": "displays",
+      "difficulty": "easy",
+      "question": "Why does dark mode save real battery on an OLED phone but almost none on an LCD?",
+      "shortAnswer": "OLED pixels produce their own light, so a black pixel is switched off and draws nothing. An LCD has one backlight that stays on regardless — dark mode just puts a dark filter in front of it.",
+      "whyItMatters": "It makes dark mode a genuine power feature on modern phones and purely a cosmetic one on older screens and most laptops.",
+      "realWorldExample": "A mostly-black OLED screen can cut display power substantially. The same interface on an LCD changes battery life by a rounding error.",
+      "technicalDetails": "Per-pixel emission also gives OLED its effectively infinite contrast ratio. The saving scales with how much of the screen is truly black — dark grey still lights the pixel, so a pure-black theme saves considerably more than a dark-grey one. LCD backlight power is set by brightness alone.",
+      "followUpQuestion": "Why do OLED screens suffer burn-in when LCDs don't?",
+      "tags": [
+        "oled",
+        "lcd",
+        "battery"
+      ]
+    },
+    {
+      "id": "seed_oauth_no_password",
+      "type": "how",
+      "category": "cybersecurity",
+      "subcategory": "oauth",
+      "difficulty": "medium",
+      "question": "How does \"Sign in with Google\" prove who you are without ever giving the app your password?",
+      "shortAnswer": "You authenticate with Google, not with the app. Google hands the app a short-lived signed token stating who you are, and the app verifies that signature. Your password never leaves Google.",
+      "whyItMatters": "It means a breach of the app cannot leak your Google password, and you can revoke the app's access at any time without changing anything.",
+      "realWorldExample": "This app signs you in exactly this way: it receives an ID token, hands it to Firebase, and never sees a credential of yours.",
+      "technicalDetails": "The ID token is a JWT signed by Google's private key, containing subject, audience, issuer and expiry. The verifier checks the signature against Google's published public keys and confirms the audience matches its own client ID — the step that stops a token issued for another app being replayed. Tokens are short-lived, so revocation takes effect quickly.",
+      "interviewAngle": "Knowing that authentication (OpenID Connect) and authorization (OAuth 2.0) are different problems, and that the ID token is the authentication half, is the distinction worth making.",
+      "followUpQuestion": "Why must a server check the \"audience\" claim on an ID token?",
+      "tags": [
+        "oauth",
+        "oidc",
+        "jwt"
+      ]
+    }
+  ]
+}
