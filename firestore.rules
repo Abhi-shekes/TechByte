@@ -1,0 +1,76 @@
+rules_version = '2';
+
+// TechByte Firestore security rules.
+//
+// Shape of the model: everything a user owns lives under /users/{uid}/…, so
+// ownership is a path check rather than a field check. Content is world-
+// readable but never client-writable — questions are published through the
+// admin workflow, never from a phone.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Admin status comes from a custom claim set server-side. A client can
+    // never grant it to itself, which is why no rule here reads a document
+    // field to decide privilege.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // ---- User-owned data -------------------------------------------------
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+                    && request.resource.data.uid == uid;
+      allow update: if isOwner(uid)
+                    // The uid must never be reassigned to another account.
+                    && request.resource.data.uid == resource.data.uid;
+      allow delete: if isOwner(uid);
+
+      // Preferences, progress, history, saved questions and sessions are all
+      // strictly private to the owner. No cross-user reads at all.
+      match /{collection}/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ---- Published content -----------------------------------------------
+
+    match /questions/{questionId} {
+      // Signed-in clients may read published content only. Drafts and
+      // unpublished revisions stay invisible to the app.
+      allow read: if isSignedIn() && resource.data.status == 'published';
+      allow write: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---- Content reports -------------------------------------------------
+
+    match /reports/{reportId} {
+      // Users may file a report and may not read, edit or delete any report,
+      // including their own — reports are moderation input, not user content.
+      allow create: if isSignedIn()
+                    && request.resource.data.reportedBy == request.auth.uid
+                    && request.resource.data.questionId is string;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Anything not matched above is denied. Listed explicitly so that adding a
+    // collection without rules fails closed rather than silently inheriting.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
