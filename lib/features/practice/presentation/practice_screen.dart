@@ -120,9 +120,7 @@ class _BudgetNote extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            exhausted
-                ? Icons.battery_alert_rounded
-                : Icons.bolt_outlined,
+            exhausted ? Icons.battery_alert_rounded : Icons.bolt_outlined,
             size: 18,
             color: exhausted
                 ? AppPalette.warningFor(isDark: isDark)

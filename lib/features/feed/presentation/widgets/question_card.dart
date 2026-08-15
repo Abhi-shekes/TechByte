@@ -152,37 +152,37 @@ class _QuestionCardState extends State<QuestionCard>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      const SizedBox(height: Space.xxl),
-                      Text(
-                        question.question,
-                        // Sized to the question rather than fixed at 34px.
-                        // A one-line "What is DNS?" wants to be big; a
-                        // 140-character question at the same size filled a
-                        // small phone on its own and pushed the reveal button
-                        // to the edge of the screen.
-                        style: _questionStyle(theme, question.question),
-                      ),
-                      const SizedBox(height: Space.xl),
-                      // Both states occupy the same slot; the answer expands
-                      // from zero height so the question never jumps.
-                      SizeTransition(
-                        sizeFactor: CurvedAnimation(
-                          parent: _controller,
-                          curve: AppCurves.emphasized,
-                        ),
-                        axisAlignment: -1,
-                        child: FadeTransition(
-                          opacity: CurvedAnimation(
-                            parent: _controller,
-                            curve: const Interval(
-                              0.25,
-                              1,
-                              curve: AppCurves.standard,
+                          const SizedBox(height: Space.xxl),
+                          Text(
+                            question.question,
+                            // Sized to the question rather than fixed at 34px.
+                            // A one-line "What is DNS?" wants to be big; a
+                            // 140-character question at the same size filled a
+                            // small phone on its own and pushed the reveal button
+                            // to the edge of the screen.
+                            style: _questionStyle(theme, question.question),
+                          ),
+                          const SizedBox(height: Space.xl),
+                          // Both states occupy the same slot; the answer expands
+                          // from zero height so the question never jumps.
+                          SizeTransition(
+                            sizeFactor: CurvedAnimation(
+                              parent: _controller,
+                              curve: AppCurves.emphasized,
+                            ),
+                            axisAlignment: -1,
+                            child: FadeTransition(
+                              opacity: CurvedAnimation(
+                                parent: _controller,
+                                curve: const Interval(
+                                  0.25,
+                                  1,
+                                  curve: AppCurves.standard,
+                                ),
+                              ),
+                              child: _AnswerBody(question: question),
                             ),
                           ),
-                          child: _AnswerBody(question: question),
-                        ),
-                      ),
                           // The swipe hint moved into the scroll rather than
                           // under it: it belongs at the point you finish
                           // reading, and inline it costs nothing on the cards
