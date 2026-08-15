@@ -1,0 +1,13 @@
+{
+  "name": "techbyte-content",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Authoring-time content generation and validation for TechByte. No dependencies, nothing deployed.",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "validate": "node validate.mjs",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" }
+}

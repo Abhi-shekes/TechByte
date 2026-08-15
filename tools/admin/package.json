@@ -1,0 +1,17 @@
+{
+  "name": "techbyte-admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local content admin CLI for TechByte. Not deployed anywhere.",
+  "bin": { "techbyte-admin": "./admin.mjs" },
+  "scripts": {
+    "validate": "node admin.mjs validate",
+    "publish": "node admin.mjs publish",
+    "list": "node admin.mjs list"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  },
+  "engines": { "node": ">=20" }
+}
