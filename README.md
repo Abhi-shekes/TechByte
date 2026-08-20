@@ -38,8 +38,8 @@ Firestore sync, and an admin CLI (`tools/admin/`).
 
    ```bash
    firebase firestore:databases:create "(default)" \
-     --location=asia-south1 --project techbyte-by-filamentai
-   firebase deploy --only firestore:rules --project techbyte-by-filamentai
+     --location=asia-south1 --project techbyte-app
+   firebase deploy --only firestore:rules --project techbyte-app
    ```
 
    `asia-south1` (Mumbai) is the right choice for India-based users. Until the
@@ -118,12 +118,12 @@ until you run build_runner.
 
 ### 2. Firebase
 
-The project `techbyte-by-filamentai` already exists and the Android app
+The project `techbyte-app` already exists and the Android app
 (`com.techbyte.app`) is registered. To regenerate local config:
 
 ```bash
 flutterfire configure \
-  --project=techbyte-by-filamentai \
+  --project=techbyte-app \
   --platforms=android \
   --android-package-name=com.techbyte.app
 ```
@@ -136,11 +136,11 @@ This writes `lib/firebase_options.dart` and
 These cannot be done from the CLI, and **sign-in will fail without them**:
 
 1. **Enable Google as a sign-in provider**
-   → [Authentication → Sign-in method](https://console.firebase.google.com/project/techbyte-by-filamentai/authentication/providers)
+   → [Authentication → Sign-in method](https://console.firebase.google.com/project/techbyte-app/authentication/providers)
    → Google → Enable → set a support email → Save.
 
 2. **Confirm the debug SHA-1 is registered**
-   → [Project settings → Your apps](https://console.firebase.google.com/project/techbyte-by-filamentai/settings/general)
+   → [Project settings → Your apps](https://console.firebase.google.com/project/techbyte-app/settings/general)
 
    The debug fingerprint for this machine is already registered:
 
@@ -155,7 +155,7 @@ These cannot be done from the CLI, and **sign-in will fail without them**:
      -alias androiddebugkey -storepass android -keypass android
    ```
 
-   then `firebase apps:android:sha:create <appId> <sha1> --project techbyte-by-filamentai`.
+   then `firebase apps:android:sha:create <appId> <sha1> --project techbyte-app`.
 
 After enabling Google sign-in, **re-run `flutterfire configure`** so the
 refreshed `google-services.json` contains the OAuth web client id that
@@ -163,7 +163,7 @@ refreshed `google-services.json` contains the OAuth web client id that
 
 ### 4. Enable the Gemini Developer API
 
-→ [Firebase AI Logic](https://console.firebase.google.com/project/techbyte-by-filamentai/ailogic)
+→ [Firebase AI Logic](https://console.firebase.google.com/project/techbyte-app/ailogic)
 → choose the **Gemini Developer API** (the no-cost option), not Vertex AI.
 
 The app never constructs the Vertex backend; see [docs/gemini.md](docs/gemini.md).
@@ -187,7 +187,7 @@ flutter test                                              # 80 tests
 dart format lib test                                      # format
 dart run build_runner build --delete-conflicting-outputs  # regenerate Drift
 flutter build apk --debug                                 # build
-firebase deploy --only firestore:rules --project techbyte-by-filamentai
+firebase deploy --only firestore:rules --project techbyte-app
 ```
 
 ---
