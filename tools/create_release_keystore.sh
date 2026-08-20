@@ -9,8 +9,8 @@
 # that is not this repository.
 set -euo pipefail
 
-PROJECT_ID="techbyte-by-filamentai"
-APP_ID="1:220022888551:android:792166ccc1774a8a3f5cc2"
+PROJECT_ID="techbyte-app"
+APP_ID="1:213851361054:android:c408bd7f48b2de6a75c30f"
 
 KEYSTORE="${1:-$HOME/techbyte-release.jks}"
 ALIAS="techbyte"
