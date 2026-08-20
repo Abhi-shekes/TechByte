@@ -4,10 +4,10 @@
 
 | | |
 |---|---|
-| Project ID | `techbyte-by-filamentai` |
+| Project ID | `techbyte-app` |
 | Display name | TechByte |
 | Android package | `com.techbyte.app` |
-| App ID | `1:220022888551:android:792166ccc1774a8a3f5cc2` |
+| App ID | `1:213851361054:android:c408bd7f48b2de6a75c30f` |
 | Plan | Spark (free) |
 
 **The plan must stay Spark.** Every service below runs inside the free tier.
@@ -36,7 +36,7 @@ Two things cannot be done from the CLI. Sign-in fails without the first.
 
 ### 1. Enable Google as a sign-in provider
 
-[Authentication → Sign-in method](https://console.firebase.google.com/project/techbyte-by-filamentai/authentication/providers)
+[Authentication → Sign-in method](https://console.firebase.google.com/project/techbyte-app/authentication/providers)
 → Google → Enable → set a support email → Save.
 
 Then **re-run `flutterfire configure`**. Enabling the provider creates the
@@ -47,7 +47,7 @@ On Android, `google_sign_in` reads that client id from the generated
 
 ### 2. Enable the Gemini Developer API
 
-[Firebase AI Logic](https://console.firebase.google.com/project/techbyte-by-filamentai/ailogic)
+[Firebase AI Logic](https://console.firebase.google.com/project/techbyte-app/ailogic)
 → choose **Gemini Developer API**, not Vertex AI.
 
 ## SHA fingerprints
@@ -67,8 +67,8 @@ keytool -list -v -keystore ~/.android/debug.keystore \
   -alias androiddebugkey -storepass android -keypass android
 
 firebase apps:android:sha:create \
-  1:220022888551:android:792166ccc1774a8a3f5cc2 <SHA1> \
-  --project techbyte-by-filamentai
+  1:213851361054:android:c408bd7f48b2de6a75c30f <SHA1> \
+  --project techbyte-app
 ```
 
 The **release** keystore fingerprint must be added before shipping, and the
@@ -103,7 +103,7 @@ flutter run --dart-define=APP_CHECK_DEBUG_TOKEN=$APP_CHECK_DEBUG_TOKEN
 ```
 
 Then register that same UUID under
-[App Check → Apps → Manage debug tokens](https://console.firebase.google.com/project/techbyte-by-filamentai/appcheck/apps).
+[App Check → Apps → Manage debug tokens](https://console.firebase.google.com/project/techbyte-app/appcheck/apps).
 
 ### Telling whether it worked
 
@@ -158,7 +158,7 @@ Both are generated and **gitignored**:
 Regenerate with:
 
 ```bash
-flutterfire configure --project=techbyte-by-filamentai \
+flutterfire configure --project=techbyte-app \
   --platforms=android --android-package-name=com.techbyte.app
 ```
 
@@ -169,7 +169,7 @@ CI restores `google-services.json` from a base64 `GOOGLE_SERVICES_JSON` secret.
 Rules in `firestore.rules`, indexes in `firestore.indexes.json`.
 
 ```bash
-firebase deploy --only firestore:rules --project techbyte-by-filamentai
+firebase deploy --only firestore:rules --project techbyte-app
 ```
 
 The database itself has not been created yet — nothing writes to it in the

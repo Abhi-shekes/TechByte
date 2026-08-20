@@ -18,7 +18,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { readPack } from '../content/pack.mjs';
 import { validateCorpus } from '../content/validator.mjs';
 
-const PROJECT_ID = 'techbyte-by-filamentai';
+const PROJECT_ID = 'techbyte-app';
 
 initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID });
 const db = getFirestore();
