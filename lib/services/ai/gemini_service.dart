@@ -381,6 +381,16 @@ class GeminiService {
         }
       } on ServerException catch (e) {
         await _usage.recordFailure(isQuota: false);
+        // A retired model id arrives here as a 404 ("no longer available to
+        // new users"). Retrying cannot fix it and "AI is busy right now" sends
+        // whoever reads it hunting for a rate limit, so call it what it is:
+        // a configuration problem, reported on the first attempt.
+        if (_isModelUnavailable(e.message)) {
+          return AiUnavailable(
+            AiUnavailableReason.notConfigured,
+            detail: e.message,
+          );
+        }
         if (attempt == AiConfig.maxRetries) {
           return AiUnavailable(
             AiUnavailableReason.rateLimited,
@@ -413,6 +423,17 @@ class GeminiService {
     }
 
     return const AiUnavailable(AiUnavailableReason.unknown);
+  }
+
+  /// Whether a server error means the configured model id itself is gone,
+  /// rather than the request being throttled or the backend having a bad
+  /// moment. Matched on the message because `firebase_ai` surfaces every
+  /// non-quota HTTP failure as the same [ServerException] type.
+  static bool _isModelUnavailable(String message) {
+    final text = message.toLowerCase();
+    return text.contains('no longer available') ||
+        text.contains('is not found') ||
+        text.contains('not found for api version');
   }
 
   /// Parses a JSON object, tolerating the same fencing as [_decodeJsonArray].

@@ -16,6 +16,61 @@ by convention — see [`QuestionValidator`](lib/features/questions/domain/questi
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/14-sign-in.png" width="200" alt="Sign in"></td>
+    <td><img src="docs/screenshots/15-onboarding-topics.png" width="200" alt="Onboarding: topics"></td>
+    <td><img src="docs/screenshots/01-daily-feed.png" width="200" alt="Daily feed"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/02-revealed-answer.png" width="200" alt="Revealed answer"></td>
+    <td><img src="docs/screenshots/03-explore-topics.png" width="200" alt="Explore topics"></td>
+    <td><img src="docs/screenshots/04-search.png" width="200" alt="Search"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/06-deep-dive-ai.png" width="200" alt="AI deep dive"></td>
+    <td><img src="docs/screenshots/05-practice-modes.png" width="200" alt="Practice modes"></td>
+    <td><img src="docs/screenshots/08-interview-question.png" width="200" alt="Interview question"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/07-ai-graded-answer.png" width="200" alt="AI-graded answer"></td>
+    <td><img src="docs/screenshots/09-saved.png" width="200" alt="Saved"></td>
+    <td><img src="docs/screenshots/11-history.png" width="200" alt="History"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/10-profile.png" width="200" alt="Profile"></td>
+    <td><img src="docs/screenshots/12-settings.png" width="200" alt="Settings"></td>
+    <td><img src="docs/screenshots/13-light-theme.png" width="200" alt="Light theme"></td>
+  </tr>
+</table>
+
+## Testing
+
+Verified on a physical Android device (realme RMX3921, Android 16 / API 36)
+with a locally-signed release build, signed in with a real Google account —
+Play Integrity (the App Check provider release builds use) cannot attest a
+debug-signed APK, so a release build was needed to exercise the Gemini-gated
+features honestly.
+
+**Covered:** sign-in and onboarding, the daily feed and reveal-answer flow,
+Explore and search, bookmarking, history, both practice modes (interview
+grading, debugging), deep dive, the theme switch, and settings.
+
+**Fixed:** the configured Gemini model id (`gemini-2.5-flash`) had been
+retired for newly-created Firebase projects and returned HTTP 404 "no
+longer available to new users" — which the app reported as a generic "AI is
+busy right now," indistinguishable from ordinary rate-limiting. Updated to
+a current model id, and reclassified a retired-model response as a
+configuration error rather than a transient one, so this fails loudly
+instead of looking like a busy backend.
+
+**Status:** Pass — feed generation, deep dive, and interview grading all
+verified against a live Gemini response after the fix.
+
+---
+
 ## Status
 
 | Phase | Scope | State |

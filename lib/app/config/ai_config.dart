@@ -15,7 +15,14 @@
 abstract final class AiConfig {
   /// Model id. Flash-class models are the ones with a usable free tier and the
   /// latency budget a swipe-driven feed needs.
-  static const model = 'gemini-2.5-flash';
+  ///
+  /// Pinned to an explicit version rather than an alias so a model swap is a
+  /// deliberate change, not something that happens under the app. Note that
+  /// Google retires older ids for *new* projects while existing ones keep
+  /// working — `gemini-2.5-flash` still answered on the original project but
+  /// returns 404 "no longer available to new users" on a freshly provisioned
+  /// one, which reaches the UI as a generic "AI is busy right now".
+  static const model = 'gemini-3.6-flash';
 
   /// Hard local ceiling on generation requests per UTC day.
   ///
