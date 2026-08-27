@@ -42,7 +42,6 @@ by convention — see [`QuestionValidator`](lib/features/questions/domain/questi
   <tr>
     <td><img src="docs/screenshots/10-profile.png" width="200" alt="Profile"></td>
     <td><img src="docs/screenshots/12-settings.png" width="200" alt="Settings"></td>
-    <td><img src="docs/screenshots/13-light-theme.png" width="200" alt="Light theme"></td>
   </tr>
 </table>
 
